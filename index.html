@@ -4,47 +4,382 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Not the Singer</title>
-  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset & Base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Space Mono', monospace;
+      background-color: #000;
+      color: #fff;
+      overflow-x: hidden;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* Navbar */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 20px 24px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    header .nav-left {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    header .nav-right {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 400;
+      transition: opacity 0.2s ease;
+      letter-spacing: 0.5px;
+    }
+
+    header .nav-right:hover {
+      opacity: 0.7;
+    }
+
+    /* Slide-out Menu */
+    .menu {
+      position: fixed;
+      top: 0;
+      left: 100%;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: #fff;
+      z-index: 200;
+      transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0;
+      overflow-y: auto;
+    }
+
+    .menu.open {
+      left: 0;
+    }
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-header .nav-left {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-header .nav-right {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      transition: opacity 0.2s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-header .nav-right:hover {
+      opacity: 0.7;
+    }
+
+    .menu-content {
+      padding: 40px 24px;
+    }
+
+    .menu-links {
+      margin-bottom: 40px;
+    }
+
+    .menu-links div {
+      margin: 0 0 20px 0;
+      font-size: 18px;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+      display: flex;
+      align-items: center;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-links div:hover {
+      opacity: 0.7;
+    }
+
+    .menu-links span {
+      margin-right: 16px;
+      color: #666;
+      font-size: 14px;
+      min-width: 24px;
+    }
+
+    .platform-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .platform-links li {
+      margin: 0 0 16px 0;
+    }
+
+    .platform-links a {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      transition: opacity 0.2s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .platform-links a:hover {
+      opacity: 0.7;
+    }
+
+    .platform-links a i {
+      font-size: 18px;
+      min-width: 24px;
+      color: #ccc;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #111 0%, #000 100%);
+      background-image: url('IMG_2505.jpeg');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      background-attachment: fixed;
+      height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+    }
+
+    .overlay {
+      background: linear-gradient(transparent 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.8) 100%);
+      width: 100%;
+      padding: 60px 24px 40px;
+      text-align: center;
+    }
+
+    .icons {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .icons a {
+      color: #fff;
+      font-size: 28px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      opacity: 0.8;
+    }
+
+    .icons a:hover {
+      transform: scale(1.15);
+      opacity: 1;
+    }
+
+    .soundcloud-player {
+      margin: 0 auto;
+      max-width: 700px;
+      padding: 0;
+    }
+
+    .soundcloud-player iframe {
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 768px) {
+      header {
+        padding: 16px 20px;
+      }
+
+      header .nav-left,
+      .menu-header .nav-left {
+        font-size: 15px;
+      }
+
+      header .nav-right,
+      .menu-header .nav-right {
+        font-size: 13px;
+      }
+
+      .menu-content {
+        padding: 32px 20px;
+      }
+
+      .menu-links div {
+        font-size: 16px;
+      }
+
+      .platform-links a {
+        font-size: 15px;
+      }
+
+      .icons {
+        gap: 20px;
+      }
+
+      .icons a {
+        font-size: 24px;
+      }
+
+      .overlay {
+        padding: 40px 20px 32px;
+      }
+
+      .soundcloud-player {
+        max-width: 100%;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .hero {
+        background-attachment: scroll;
+      }
+
+      .icons {
+        gap: 16px;
+      }
+
+      .icons a {
+        font-size: 22px;
+      }
+
+      .menu-links div {
+        font-size: 15px;
+      }
+
+      .platform-links a {
+        font-size: 14px;
+      }
+    }
+
+    /* Dark mode scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
 </head>
 <body>
   <!-- Navbar -->
   <header>
-    <div class="nav-left">Not the Singer</div>
-    <div class="nav-right" onclick="toggleMenu()">Menu <i class="fas fa-bars"></i></div>
+    <div class="nav-left">NOT THE SINGER</div>
+    <div class="nav-right" onclick="toggleMenu()">
+      MENU <i class="fas fa-bars"></i>
+    </div>
   </header>
   
   <!-- Slide-out Menu -->
   <div id="menu" class="menu">
     <div class="menu-header">
-      <div class="nav-left">Not the Singer</div>
-      <div class="nav-right" onclick="toggleMenu()">Close <i class="fas fa-times"></i></div>
+      <div class="nav-left">NOT THE SINGER</div>
+      <div class="nav-right" onclick="toggleMenu()">
+        CLOSE <i class="fas fa-times"></i>
+      </div>
     </div>
-    <div class="menu-links">
-      <div><span>01</span> Music</div>
-      <div><span>02</span> Info</div>
+    <div class="menu-content">
+      <div class="menu-links">
+        <div><span>01</span> MUSIC</div>
+        <div><span>02</span> INFO</div>
+      </div>
+      <ul class="platform-links">
+        <li><a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
+          <i class="fab fa-spotify"></i> SPOTIFY
+        </a></li>
+        <li><a href="https://www.instagram.com/not_the_singer" target="_blank">
+          <i class="fab fa-instagram"></i> INSTAGRAM
+        </a></li>
+        <li><a href="https://notthesinger.bandcamp.com/" target="_blank">
+          <i class="fab fa-bandcamp"></i> BANDCAMP
+        </a></li>
+        <li><a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
+          <i class="fab fa-apple"></i> APPLE MUSIC
+        </a></li>
+        <li><a href="https://soundcloud.com/not-the-singer" target="_blank">
+          <i class="fab fa-soundcloud"></i> SOUNDCLOUD
+        </a></li>
+        <li><a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
+          <i class="fab fa-youtube"></i> YOUTUBE
+        </a></li>
+      </ul>
     </div>
-    <ul class="platform-links">
-      <li><a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank"><i class="fab fa-spotify"></i> Spotify</a></li>
-      <li><a href="https://www.instagram.com/not_the_singer" target="_blank"><i class="fab fa-instagram"></i> Instagram</a></li>
-      <li><a href="https://notthesinger.bandcamp.com/" target="_blank"><i class="fab fa-bandcamp"></i> Bandcamp</a></li>
-      <li><a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank"><i class="fab fa-apple"></i> Apple Music</a></li>
-      <li><a href="https://soundcloud.com/not-the-singer" target="_blank"><i class="fab fa-soundcloud"></i> SoundCloud</a></li>
-      <li><a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank"><i class="fab fa-youtube"></i> YouTube</a></li>
-    </ul>
   </div>
   
   <!-- Hero Section -->
   <section class="hero">
     <div class="overlay">
       <div class="icons">
-        <a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank"><i class="fab fa-spotify"></i></a>
-        <a href="https://www.instagram.com/not_the_singer" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a href="https://notthesinger.bandcamp.com/" target="_blank"><i class="fab fa-bandcamp"></i></a>
-        <a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank"><i class="fab fa-apple"></i></a>
-        <a href="https://soundcloud.com/not-the-singer" target="_blank"><i class="fab fa-soundcloud"></i></a>
-        <a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
+          <i class="fab fa-spotify"></i>
+        </a>
+        <a href="https://www.instagram.com/not_the_singer" target="_blank">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://notthesinger.bandcamp.com/" target="_blank">
+          <i class="fab fa-bandcamp"></i>
+        </a>
+        <a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
+          <i class="fab fa-apple"></i>
+        </a>
+        <a href="https://soundcloud.com/not-the-singer" target="_blank">
+          <i class="fab fa-soundcloud"></i>
+        </a>
+        <a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
+          <i class="fab fa-youtube"></i>
+        </a>
       </div>
       <div class="soundcloud-player">
         <iframe width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay"
@@ -59,6 +394,21 @@
       const menu = document.getElementById('menu');
       menu.classList.toggle('open');
     }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById('menu');
+      const menuTrigger = document.querySelector('.nav-right');
+      
+      if (!menu.contains(event.target) && !menuTrigger.contains(event.target)) {
+        menu.classList.remove('open');
+      }
+    });
+
+    // Prevent menu from closing when clicking inside
+    document.getElementById('menu').addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
   </script>
 </body>
 </html>
