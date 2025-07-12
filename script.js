@@ -210,21 +210,24 @@ function closeAlbumDetail() {
   }, 300);
 }
 
-// Close menu when clicking on menu items
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', function() {
-    if (this.textContent.trim().includes('Music')) {
-      showMusic();
-    } else {
-      console.log('Navigate to:', this.textContent.trim());
-      closeMenu();
-    }
+// Wait for DOM to be fully loaded before adding event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  // Close menu when clicking on menu items
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function() {
+      if (this.textContent.trim().includes('Music')) {
+        showMusic();
+      } else {
+        console.log('Navigate to:', this.textContent.trim());
+        closeMenu();
+      }
+    });
   });
-});
 
-// Prevent menu from closing when clicking inside dropdown
-document.getElementById('menuDropdown').addEventListener('click', function(event) {
-  event.stopPropagation();
+  // Prevent menu from closing when clicking inside dropdown
+  document.getElementById('menuDropdown').addEventListener('click', function(event) {
+    event.stopPropagation();
+  });
 });
 
 // Handle back button functionality
