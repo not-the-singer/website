@@ -1,40 +1,132 @@
-body, html {
+/* General Reset */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+}
+body, html {
   height: 100%;
-  font-family: sans-serif;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #000;
+  overflow-x: hidden;
 }
 
+/* Header Navigation */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  z-index: 10;
+}
+header .nav-right {
+  cursor: pointer;
+}
+
+/* Slide-out Menu */
+.menu {
+  position: fixed;
+  top: 0;
+  left: 100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 20, 0.9);
+  color: white;
+  z-index: 15;
+  transition: left 0.4s ease;
+  padding: 20px;
+}
+.menu.open {
+  left: 0;
+}
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.menu-links {
+  margin-bottom: 20px;
+}
+.menu-links div {
+  margin: 8px 0;
+  font-size: 18px;
+}
+.menu-links span {
+  margin-right: 10px;
+  color: #aaa;
+}
+.platform-links {
+  list-style: none;
+  padding-left: 0;
+}
+.platform-links li {
+  margin: 10px 0;
+}
+.platform-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+}
+.platform-links a i {
+  margin-right: 8px;
+}
+
+/* Hero Section */
 .hero {
   background: url('IMG_2505.jpeg') no-repeat center center fixed;
   background-size: cover;
-  height: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   position: relative;
 }
-
 .overlay {
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
-  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  padding: 40px 0;
+  text-align: center;
+}
+.icons {
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
+  gap: 20px;
+}
+.icons a {
+  color: white;
+  font-size: 24px;
+  transition: transform 0.2s;
+}
+.icons a:hover {
+  transform: scale(1.2);
+}
+.credit {
+  margin-top: 16px;
+  color: #aaa;
+  font-size: 14px;
+}
+
+/* Music Embed Section */
+.music-embed {
+  padding: 30px 10px;
+  background: #111;
   text-align: center;
 }
 
-h1 {
-  font-size: 3em;
-  margin-bottom: 20px;
-}
-
-.links a {
-  color: white;
-  margin: 0 15px;
-  text-decoration: none;
-  font-size: 1.2em;
-}
-
-.links a:hover {
-  text-decoration: underline;
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .icons {
+    gap: 12px;
+  }
+  .icons a {
+    font-size: 20px;
+  }
+  .platform-links a {
+    font-size: 16px;
+  }
 }
