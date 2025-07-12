@@ -213,22 +213,35 @@
       text-align: center;
     }
 
-    .icons {
+    /* Floating Social Icons */
+    .floating-icons {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
       display: flex;
       justify-content: center;
-      gap: 32px;
+      gap: 24px;
       flex-wrap: wrap;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      padding: 16px 24px;
+      max-width: 90vw;
     }
 
-    .icons a {
+    .floating-icons a {
       color: #fff;
-      font-size: 32px;
+      font-size: 24px;
       transition: all 0.3s ease;
       text-decoration: none;
       opacity: 0.85;
     }
 
-    .icons a:hover {
+    .floating-icons a:hover {
       transform: scale(1.2);
       opacity: 1;
     }
@@ -287,26 +300,24 @@
         right: -10px;
       }
 
-      .icons {
-        gap: 24px;
+      .floating-icons {
+        bottom: 16px;
+        gap: 20px;
+        padding: 12px 20px;
       }
 
-      .icons a {
-        font-size: 28px;
+      .floating-icons a {
+        font-size: 22px;
       }
 
       .overlay {
-        padding: 40px 20px 80px;
+        padding: 40px 20px 40px;
       }
     }
 
     @media screen and (max-width: 480px) {
       .hero {
         background-attachment: scroll;
-      }
-
-      .overlay {
-        padding: 32px 16px 100px;
       }
 
       .nav-bubbles {
@@ -329,12 +340,19 @@
         right: -20px;
       }
 
-      .icons {
-        gap: 20px;
+      .floating-icons {
+        bottom: 12px;
+        gap: 16px;
+        padding: 10px 16px;
+        border-radius: 25px;
       }
 
-      .icons a {
-        font-size: 26px;
+      .floating-icons a {
+        font-size: 20px;
+      }
+
+      .overlay {
+        padding: 32px 16px 32px;
       }
     }
 
@@ -431,32 +449,34 @@
     </div>
   </div>
 
+  <!-- Floating Social Icons -->
+  <div class="floating-icons">
+    <a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
+      <i class="fab fa-spotify"></i>
+    </a>
+    <a href="https://www.instagram.com/not_the_singer" target="_blank">
+      <i class="fab fa-instagram"></i>
+    </a>
+    <a href="https://notthesinger.bandcamp.com/" target="_blank">
+      <i class="fab fa-bandcamp"></i>
+    </a>
+    <a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
+      <i class="fab fa-apple"></i>
+    </a>
+    <a href="https://soundcloud.com/not-the-singer" target="_blank">
+      <i class="fab fa-soundcloud"></i>
+    </a>
+    <a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
+      <i class="fab fa-youtube"></i>
+    </a>
+  </div>
+
   <!-- Click Outside Overlay -->
   <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
   
   <!-- Hero Section -->
   <section class="hero">
     <div class="overlay">
-      <div class="icons">
-        <a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
-          <i class="fab fa-spotify"></i>
-        </a>
-        <a href="https://www.instagram.com/not_the_singer" target="_blank">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a href="https://notthesinger.bandcamp.com/" target="_blank">
-          <i class="fab fa-bandcamp"></i>
-        </a>
-        <a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
-          <i class="fab fa-apple"></i>
-        </a>
-        <a href="https://soundcloud.com/not-the-singer" target="_blank">
-          <i class="fab fa-soundcloud"></i>
-        </a>
-        <a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
-          <i class="fab fa-youtube"></i>
-        </a>
-      </div>
     </div>
   </section>
   
