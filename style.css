@@ -1,10 +1,6 @@
-body { border: 10px solid red !important; }
-
-/* Reset & Base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.hero {
+  background: red !important;
+  /* Remove the rest of the background properties temporarily */
 }
 
 - {
