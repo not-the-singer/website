@@ -30,12 +30,24 @@
     .nav-bubbles {
       position: fixed;
       top: 20px;
+      left: 20px;
       right: 20px;
       z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .nav-left-bubble {
+      display: flex;
+    }
+
+    .nav-right-bubble {
       display: flex;
       flex-direction: column;
       gap: 12px;
       align-items: flex-end;
+      position: relative;
     }
 
     .bubble {
@@ -261,8 +273,8 @@
     @media screen and (max-width: 768px) {
       .nav-bubbles {
         top: 16px;
+        left: 16px;
         right: 16px;
-        gap: 10px;
       }
 
       .bubble {
@@ -271,7 +283,7 @@
       }
 
       .bubble.logo {
-        font-size: 15px;
+        font-size: 14px;
       }
 
       .menu-dropdown {
@@ -299,6 +311,7 @@
 
       .nav-bubbles {
         top: 12px;
+        left: 12px;
         right: 12px;
       }
 
@@ -308,7 +321,7 @@
       }
 
       .bubble.logo {
-        font-size: 14px;
+        font-size: 13px;
       }
 
       .menu-dropdown {
@@ -365,48 +378,55 @@
 <body>
   <!-- Floating Navigation Bubbles -->
   <div class="nav-bubbles">
-    <div class="bubble logo" onclick="goHome()">
-      NTS
-    </div>
-    <div class="bubble menu-trigger" onclick="toggleMenu()" id="menuTrigger">
-      Menu <i class="fas fa-bars"></i>
+    <!-- Left Side - Logo -->
+    <div class="nav-left-bubble">
+      <div class="bubble logo" onclick="goHome()">
+        Not the Singer
+      </div>
     </div>
     
-    <!-- Menu Dropdown -->
-    <div class="menu-dropdown" id="menuDropdown">
-      <div class="menu-section">
-        <div class="nav-items">
-          <div class="nav-item">
-            <span>01</span> Music
-          </div>
-          <div class="nav-item">
-            <span>02</span> Info
-          </div>
-        </div>
+    <!-- Right Side - Menu -->
+    <div class="nav-right-bubble">
+      <div class="bubble menu-trigger" onclick="toggleMenu()" id="menuTrigger">
+        Menu <i class="fas fa-bars"></i>
       </div>
       
-      <div class="menu-section">
-        <h3>Platforms</h3>
-        <ul class="menu-links">
-          <li><a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
-            <i class="fab fa-spotify"></i> Spotify
-          </a></li>
-          <li><a href="https://www.instagram.com/not_the_singer" target="_blank">
-            <i class="fab fa-instagram"></i> Instagram
-          </a></li>
-          <li><a href="https://notthesinger.bandcamp.com/" target="_blank">
-            <i class="fab fa-bandcamp"></i> Bandcamp
-          </a></li>
-          <li><a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
-            <i class="fab fa-apple"></i> Apple Music
-          </a></li>
-          <li><a href="https://soundcloud.com/not-the-singer" target="_blank">
-            <i class="fab fa-soundcloud"></i> SoundCloud
-          </a></li>
-          <li><a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
-            <i class="fab fa-youtube"></i> YouTube
-          </a></li>
-        </ul>
+      <!-- Menu Dropdown -->
+      <div class="menu-dropdown" id="menuDropdown">
+        <div class="menu-section">
+          <div class="nav-items">
+            <div class="nav-item">
+              <span>01</span> Music
+            </div>
+            <div class="nav-item">
+              <span>02</span> Info
+            </div>
+          </div>
+        </div>
+        
+        <div class="menu-section">
+          <h3>Platforms</h3>
+          <ul class="menu-links">
+            <li><a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
+              <i class="fab fa-spotify"></i> Spotify
+            </a></li>
+            <li><a href="https://www.instagram.com/not_the_singer" target="_blank">
+              <i class="fab fa-instagram"></i> Instagram
+            </a></li>
+            <li><a href="https://notthesinger.bandcamp.com/" target="_blank">
+              <i class="fab fa-bandcamp"></i> Bandcamp
+            </a></li>
+            <li><a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
+              <i class="fab fa-apple"></i> Apple Music
+            </a></li>
+            <li><a href="https://soundcloud.com/not-the-singer" target="_blank">
+              <i class="fab fa-soundcloud"></i> SoundCloud
+            </a></li>
+            <li><a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
+              <i class="fab fa-youtube"></i> YouTube
+            </a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
