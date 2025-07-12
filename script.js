@@ -2,77 +2,111 @@ let isMenuOpen = false;
 let isOnMusicPage = false;
 let isOnAlbumDetail = false;
 
-// Sample album data (in real implementation, this would come from SoundCloud API)
-const albums = [
-  {
-    id: 1,
-    title: "Perpetual Motion",
-    type: "EP",
-    date: "23 Dec 2024",
-    artwork: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop&crop=faces",
-    links: {
-      spotify: "https://open.spotify.com/album/example1",
-      apple: "https://music.apple.com/album/example1",
-      bandcamp: "https://notthesinger.bandcamp.com/album/example1",
-      soundcloud: "https://soundcloud.com/not-the-singer/example1",
-      youtube: "https://youtube.com/watch?v=example1",
-      deezer: "https://deezer.com/album/example1",
-      tidal: "https://tidal.com/album/example1",
-      amazonMusic: "https://music.amazon.com/album/example1"
-    }
-  },
-  {
-    id: 2,
-    title: "Digital Landscapes",
-    type: "Single",
-    date: "15 Nov 2024",
-    artwork: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&crop=faces",
-    links: {
-      spotify: "https://open.spotify.com/album/example2",
-      apple: "https://music.apple.com/album/example2",
-      bandcamp: "https://notthesinger.bandcamp.com/album/example2",
-      soundcloud: "https://soundcloud.com/not-the-singer/example2",
-      youtube: "https://youtube.com/watch?v=example2",
-      deezer: "https://deezer.com/album/example2",
-      tidal: "https://tidal.com/album/example2",
-      amazonMusic: "https://music.amazon.com/album/example2"
-    }
-  },
-  {
-    id: 3,
-    title: "Underground Frequencies",
-    type: "EP",
-    date: "03 Oct 2024",
-    artwork: "https://images.unsplash.com/photo-1571974599782-87624638275c?w=400&h=400&fit=crop&crop=faces",
-    links: {
-      spotify: "https://open.spotify.com/album/example3",
-      apple: "https://music.apple.com/album/example3",
-      bandcamp: "https://notthesinger.bandcamp.com/album/example3",
-      soundcloud: "https://soundcloud.com/not-the-singer/example3",
-      youtube: "https://youtube.com/watch?v=example3",
-      deezer: "https://deezer.com/album/example3",
-      tidal: "https://tidal.com/album/example3",
-      amazonMusic: "https://music.amazon.com/album/example3"
-    }
-  },
-  {
-    id: 4,
-    title: "Neon Nights",
-    type: "Single",
-    date: "12 Sep 2024",
-    artwork: "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=400&h=400&fit=crop&crop=faces",
-    links: {
-      spotify: "https://open.spotify.com/album/example4",
-      apple: "https://music.apple.com/album/example4",
-      bandcamp: "https://notthesinger.bandcamp.com/album/example4",
-      soundcloud: "https://soundcloud.com/not-the-singer/example4",
-      youtube: "https://youtube.com/watch?v=example4",
-      deezer: "https://deezer.com/album/example4",
-      tidal: "https://tidal.com/album/example4",
-      amazonMusic: "https://music.amazon.com/album/example4"
-    }
+// SoundCloud configuration
+const SOUNDCLOUD_USER_ID = 'not-the-singer'; // Replace with your actual username
+let albums = [];
+
+// Function to fetch data from SoundCloud
+async function fetchSoundCloudData() {
+  try {
+    // For now, using sample data structure that matches SoundCloud API
+    // You'll need to register for SoundCloud API and get a client_id
+    albums = [
+      {
+        id: 1,
+        title: "Perpetual Motion",
+        type: "EP",
+        date: "2024-12-23T00:00:00Z",
+        artwork: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop&crop=faces",
+        duration: 1440000, // in milliseconds
+        track_count: 4,
+        links: {
+          spotify: "https://open.spotify.com/album/example1",
+          apple: "https://music.apple.com/album/example1",
+          bandcamp: "https://notthesinger.bandcamp.com/album/example1",
+          soundcloud: "https://soundcloud.com/not-the-singer/sets/perpetual-motion",
+          youtube: "https://youtube.com/playlist?list=example1",
+          deezer: "https://deezer.com/album/example1",
+          tidal: "https://tidal.com/album/example1",
+          amazonMusic: "https://music.amazon.com/album/example1"
+        }
+      },
+      {
+        id: 2,
+        title: "Digital Landscapes",
+        type: "Single",
+        date: "2024-11-15T00:00:00Z",
+        artwork: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&crop=faces",
+        duration: 240000,
+        track_count: 1,
+        links: {
+          spotify: "https://open.spotify.com/track/example2",
+          apple: "https://music.apple.com/track/example2",
+          bandcamp: "https://notthesinger.bandcamp.com/track/digital-landscapes",
+          soundcloud: "https://soundcloud.com/not-the-singer/digital-landscapes",
+          youtube: "https://youtube.com/watch?v=example2",
+          deezer: "https://deezer.com/track/example2",
+          tidal: "https://tidal.com/track/example2",
+          amazonMusic: "https://music.amazon.com/track/example2"
+        }
+      },
+      {
+        id: 3,
+        title: "Underground Frequencies",
+        type: "EP",
+        date: "2024-10-03T00:00:00Z",
+        artwork: "https://images.unsplash.com/photo-1571974599782-87624638275c?w=400&h=400&fit=crop&crop=faces",
+        duration: 1200000,
+        track_count: 3,
+        links: {
+          spotify: "https://open.spotify.com/album/example3",
+          apple: "https://music.apple.com/album/example3",
+          bandcamp: "https://notthesinger.bandcamp.com/album/underground-frequencies",
+          soundcloud: "https://soundcloud.com/not-the-singer/sets/underground-frequencies",
+          youtube: "https://youtube.com/playlist?list=example3",
+          deezer: "https://deezer.com/album/example3",
+          tidal: "https://tidal.com/album/example3",
+          amazonMusic: "https://music.amazon.com/album/example3"
+        }
+      },
+      {
+        id: 4,
+        title: "Neon Nights",
+        type: "Single",
+        date: "2024-09-12T00:00:00Z",
+        artwork: "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=400&h=400&fit=crop&crop=faces",
+        duration: 300000,
+        track_count: 1,
+        links: {
+          spotify: "https://open.spotify.com/track/example4",
+          apple: "https://music.apple.com/track/example4",
+          bandcamp: "https://notthesinger.bandcamp.com/track/neon-nights",
+          soundcloud: "https://soundcloud.com/not-the-singer/neon-nights",
+          youtube: "https://youtube.com/watch?v=example4",
+          deezer: "https://deezer.com/track/example4",
+          tidal: "https://tidal.com/track/example4",
+          amazonMusic: "https://music.amazon.com/track/example4"
+        }
+      }
+    ];
+  } catch (error) {
+    console.error('Error fetching SoundCloud data:', error);
   }
-];
+}
+
+// Helper function to format date
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return date.toLocaleDateString('en-GB', options);
+}
+
+// Helper function to format duration
+function formatDuration(milliseconds) {
+  const minutes = Math.floor(milliseconds / 60000);
+  const seconds = Math.floor((milliseconds % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
 
 function toggleMenu() {
   const dropdown = document.getElementById('menuDropdown');
@@ -137,14 +171,19 @@ function loadAlbums() {
     albumCard.className = 'album-card';
     albumCard.onclick = () => showAlbumDetail(album);
     
+    // Create additional info for the new layout
+    const trackInfo = album.track_count > 1 ? `${album.track_count} tracks` : '1 track';
+    const formattedDate = formatDate(album.date);
+    const duration = album.duration ? formatDuration(album.duration) : '';
+    
     albumCard.innerHTML = `
       <div class="album-artwork">
         <img src="${album.artwork}" alt="${album.title}" loading="lazy">
       </div>
       <div class="album-info">
         <div class="album-title">${album.title}</div>
-        <div class="album-type">${album.type}</div>
-        <div class="album-date">${album.date}</div>
+        <div class="album-type">${album.type} • ${trackInfo} ${duration ? '• ' + duration : ''}</div>
+        <div class="album-date">${formattedDate}</div>
       </div>
     `;
     
@@ -165,7 +204,12 @@ function showAlbumDetail(album) {
   // Set album info
   detailArtwork.src = album.artwork;
   detailTitle.textContent = album.title;
-  detailMeta.textContent = `${album.type} • ${album.date}`;
+  
+  // Format metadata
+  const trackInfo = album.track_count > 1 ? `${album.track_count} tracks` : '1 track';
+  const formattedDate = formatDate(album.date);
+  const duration = album.duration ? formatDuration(album.duration) : '';
+  detailMeta.textContent = `${album.type} • ${trackInfo} ${duration ? '• ' + duration : ''} • ${formattedDate}`;
   
   // Create streaming links
   streamingLinks.innerHTML = '';
@@ -212,6 +256,9 @@ function closeAlbumDetail() {
 
 // Wait for DOM to be fully loaded before adding event listeners
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize SoundCloud data
+  fetchSoundCloudData();
+  
   // Close menu when clicking on menu items
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', function() {
