@@ -2,163 +2,87 @@ let isMenuOpen = false;
 let isOnMusicPage = false;
 let isOnAlbumDetail = false;
 
-// Spotify API configuration
-const SPOTIFY_CLIENT_ID = '35be0285e67a4fafbe3b31b7b0048dc0';
-const SPOTIFY_ARTIST_ID = '50imQLsQADUBJTKncqsb3I';
+// API configuration
+const API_BASE_URL = 'https://not-the-singer-api.vercel.app';
 let albums = [];
-let spotifyToken = '';
 
-// Get Spotify access token
-async function getSpotifyToken() {
-  try {
-    const response = await fetch('https://accounts.spotify.com/api/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `grant_type=client_credentials&client_id=${SPOTIFY_CLIENT_ID}&client_secret=YOUR_CLIENT_SECRET`
-    });
-    
-    // Since we don't have client secret, we'll use the public client credentials flow
-    // For now, let's use a different approach - direct API calls that work without secret
-    return null;
-  } catch (error) {
-    console.error('Error getting Spotify token:', error);
-    return null;
-  }
-}
-
-// Fetch albums from Spotify (using public endpoints)
+// Fetch real albums from your Spotify API
 async function fetchSpotifyAlbums() {
   try {
-    // For production, you'd need the client credentials flow
-    // For now, let's structure the data to match what Spotify returns
-    // and simulate real album data
+    console.log('Fetching albums from Spotify API...');
     
-    // This would be the real API call:
-    // const response = await fetch(`https://api.spotify.com/v1/artists/${SPOTIFY_ARTIST_ID}/albums?include_groups=album,single&limit=50`, {
-    //   headers: { 'Authorization': `Bearer ${spotifyToken}` }
-    // });
+    const response = await fetch(`${API_BASE_URL}/api/spotify`);
     
-    // Simulated Spotify-like data structure for now
-    albums = [
-      {
-        id: 'spotify_album_1',
-        name: 'Perpetual Motion',
-        album_type: 'album',
-        release_date: '2024-12-23',
-        release_date_precision: 'day',
-        total_tracks: 4,
-        images: [
-          {
-            url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=640&h=640&fit=crop',
-            height: 640,
-            width: 640
-          }
-        ],
-        external_urls: {
-          spotify: 'https://open.spotify.com/album/example1'
-        },
-        // Additional streaming links (you'd populate these manually or from another service)
-        streaming_links: {
-          apple: 'https://music.apple.com/album/example1',
-          bandcamp: 'https://notthesinger.bandcamp.com/album/perpetual-motion',
-          soundcloud: 'https://soundcloud.com/not-the-singer/sets/perpetual-motion',
-          youtube: 'https://youtube.com/playlist?list=example1',
-          deezer: 'https://deezer.com/album/example1',
-          tidal: 'https://tidal.com/album/example1',
-          amazonMusic: 'https://music.amazon.com/album/example1'
-        }
-      },
-      {
-        id: 'spotify_single_1',
-        name: 'Digital Landscapes',
-        album_type: 'single',
-        release_date: '2024-11-15',
-        release_date_precision: 'day',
-        total_tracks: 1,
-        images: [
-          {
-            url: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=640&h=640&fit=crop',
-            height: 640,
-            width: 640
-          }
-        ],
-        external_urls: {
-          spotify: 'https://open.spotify.com/track/example2'
-        },
-        streaming_links: {
-          apple: 'https://music.apple.com/song/example2',
-          bandcamp: 'https://notthesinger.bandcamp.com/track/digital-landscapes',
-          soundcloud: 'https://soundcloud.com/not-the-singer/digital-landscapes',
-          youtube: 'https://youtube.com/watch?v=example2',
-          deezer: 'https://deezer.com/track/example2',
-          tidal: 'https://tidal.com/track/example2',
-          amazonMusic: 'https://music.amazon.com/track/example2'
-        }
-      },
-      {
-        id: 'spotify_album_2',
-        name: 'Underground Frequencies',
-        album_type: 'album',
-        release_date: '2024-10-03',
-        release_date_precision: 'day',
-        total_tracks: 3,
-        images: [
-          {
-            url: 'https://images.unsplash.com/photo-1571974599782-87624638275c?w=640&h=640&fit=crop',
-            height: 640,
-            width: 640
-          }
-        ],
-        external_urls: {
-          spotify: 'https://open.spotify.com/album/example3'
-        },
-        streaming_links: {
-          apple: 'https://music.apple.com/album/example3',
-          bandcamp: 'https://notthesinger.bandcamp.com/album/underground-frequencies',
-          soundcloud: 'https://soundcloud.com/not-the-singer/sets/underground-frequencies',
-          youtube: 'https://youtube.com/playlist?list=example3',
-          deezer: 'https://deezer.com/album/example3',
-          tidal: 'https://tidal.com/album/example3',
-          amazonMusic: 'https://music.amazon.com/album/example3'
-        }
-      },
-      {
-        id: 'spotify_single_2',
-        name: 'Neon Nights',
-        album_type: 'single',
-        release_date: '2024-09-12',
-        release_date_precision: 'day',
-        total_tracks: 1,
-        images: [
-          {
-            url: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=640&h=640&fit=crop',
-            height: 640,
-            width: 640
-          }
-        ],
-        external_urls: {
-          spotify: 'https://open.spotify.com/track/example4'
-        },
-        streaming_links: {
-          apple: 'https://music.apple.com/song/example4',
-          bandcamp: 'https://notthesinger.bandcamp.com/track/neon-nights',
-          soundcloud: 'https://soundcloud.com/not-the-singer/neon-nights',
-          youtube: 'https://youtube.com/watch?v=example4',
-          deezer: 'https://deezer.com/track/example4',
-          tidal: 'https://tidal.com/track/example4',
-          amazonMusic: 'https://music.amazon.com/track/example4'
-        }
-      }
-    ];
+    if (!response.ok) {
+      throw new Error(`API responded with status: ${response.status}`);
+    }
+    
+    const spotifyAlbums = await response.json();
+    console.log('Raw Spotify data:', spotifyAlbums);
+    
+    // Transform Spotify data to our format and add manual streaming links
+    albums = spotifyAlbums.map(album => ({
+      id: album.id,
+      name: album.name,
+      album_type: album.album_type,
+      release_date: album.release_date,
+      release_date_precision: album.release_date_precision,
+      total_tracks: album.total_tracks,
+      images: album.images,
+      external_urls: album.external_urls,
+      // Add your manual streaming links here
+      streaming_links: getStreamingLinksForAlbum(album.name, album.album_type)
+    }));
     
     // Sort by release date (newest first)
     albums.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
     
+    console.log('Processed albums:', albums);
+    
   } catch (error) {
     console.error('Error fetching Spotify albums:', error);
+    
+    // Fallback to sample data if API fails
+    albums = [
+      {
+        id: 'fallback_1',
+        name: 'API Connection Issue',
+        album_type: 'single',
+        release_date: '2024-01-01',
+        total_tracks: 1,
+        images: [{ url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=640&h=640&fit=crop' }],
+        external_urls: { spotify: '#' },
+        streaming_links: {}
+      }
+    ];
   }
+}
+
+// Manual streaming links mapping (update these with your real links)
+function getStreamingLinksForAlbum(albumName, albumType) {
+  // You can customize this function to return different links for different albums
+  const baseLinks = {
+    apple: 'https://music.apple.com/artist/not-the-singer/1597993257',
+    bandcamp: 'https://notthesinger.bandcamp.com/',
+    soundcloud: 'https://soundcloud.com/not-the-singer',
+    youtube: 'https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww',
+    deezer: 'https://deezer.com/artist/not-the-singer',
+    tidal: 'https://tidal.com/artist/not-the-singer',
+    amazonMusic: 'https://music.amazon.com/artist/not-the-singer'
+  };
+  
+  // You can add specific links for specific albums here
+  if (albumName.toLowerCase().includes('perpetual motion')) {
+    return {
+      ...baseLinks,
+      bandcamp: 'https://notthesinger.bandcamp.com/album/perpetual-motion',
+      soundcloud: 'https://soundcloud.com/not-the-singer/sets/perpetual-motion'
+    };
+  }
+  
+  // Add more specific album mappings as needed
+  
+  return baseLinks;
 }
 
 // Helper function to format date
@@ -234,13 +158,18 @@ function loadAlbums() {
   const albumGrid = document.getElementById('albumGrid');
   albumGrid.innerHTML = '';
   
+  if (albums.length === 0) {
+    albumGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Loading albums...</div>';
+    return;
+  }
+  
   albums.forEach((album, index) => {
     const albumCard = document.createElement('div');
     albumCard.className = 'album-card';
     albumCard.onclick = () => showAlbumDetail(album);
     
-    // Get the best quality image
-    const artwork = album.images && album.images.length > 0 ? album.images[0].url : '';
+    // Get the best quality image (Spotify provides multiple sizes)
+    const artwork = album.images && album.images.length > 0 ? album.images[0].url : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop';
     
     // Format album info
     const albumType = getAlbumTypeDisplay(album.album_type, album.total_tracks);
@@ -270,7 +199,7 @@ function showAlbumDetail(album) {
   const streamingLinks = document.getElementById('streamingLinks');
   
   // Get the best quality image
-  const artwork = album.images && album.images.length > 0 ? album.images[0].url : '';
+  const artwork = album.images && album.images.length > 0 ? album.images[0].url : 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop';
   
   // Set background to blurred album artwork
   detailPage.style.backgroundImage = `url(${artwork})`;
@@ -300,7 +229,7 @@ function showAlbumDetail(album) {
   ];
   
   streamingPlatforms.forEach(platform => {
-    if (platform.url) {
+    if (platform.url && platform.url !== '#') {
       const link = document.createElement('a');
       link.href = platform.url;
       link.target = '_blank';
