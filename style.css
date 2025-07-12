@@ -198,17 +198,17 @@ min-width: 20px;
 
 /* Hero Page */
 .hero {
-background: linear-gradient(135deg, #111 0%, #000 100%);
-background-image: url(‘IMG_2505.jpeg’);
-background-repeat: no-repeat;
-background-position: center center;
-background-size: cover;
-background-attachment: fixed;
-height: 100vh;
-display: flex;
-align-items: flex-end;
-justify-content: center;
-position: relative;
+  background: linear-gradient(135deg, #111 0%, #000 100%);
+  background-image: url('IMG_2505.jpeg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
 }
 
 .overlay {
