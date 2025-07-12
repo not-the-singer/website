@@ -1,4 +1,4 @@
-/* General Reset */
+/* Reset & Base */
 * {
   margin: 0;
   padding: 0;
@@ -11,7 +11,7 @@ body, html {
   overflow-x: hidden;
 }
 
-/* Header Navigation */
+/* Navbar */
 header {
   position: fixed;
   top: 0;
@@ -35,7 +35,7 @@ header .nav-right {
   left: 100%;
   width: 100%;
   height: 100%;
-  background: rgba(20, 20, 20, 0.9);
+  background: rgba(20, 20, 20, 0.95);
   color: white;
   z-index: 15;
   transition: left 0.4s ease;
@@ -76,7 +76,7 @@ header .nav-right {
   margin-right: 8px;
 }
 
-/* Hero Section */
+/* Hero */
 .hero {
   background: url('IMG_2505.jpeg') no-repeat center center fixed;
   background-size: cover;
@@ -87,7 +87,7 @@ header .nav-right {
   position: relative;
 }
 .overlay {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   width: 100%;
   padding: 40px 0;
   text-align: center;
@@ -96,6 +96,7 @@ header .nav-right {
   display: flex;
   justify-content: center;
   gap: 20px;
+  margin-bottom: 20px;
 }
 .icons a {
   color: white;
@@ -105,17 +106,10 @@ header .nav-right {
 .icons a:hover {
   transform: scale(1.2);
 }
-.credit {
-  margin-top: 16px;
-  color: #aaa;
-  font-size: 14px;
-}
-
-/* Music Embed Section */
-.music-embed {
-  padding: 30px 10px;
-  background: #111;
-  text-align: center;
+.soundcloud-player {
+  margin: 0 auto;
+  max-width: 700px;
+  padding: 0 20px;
 }
 
 /* Responsive */
