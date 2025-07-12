@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Not the Singer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000'/><text x='50' y='60' font-family='monospace' font-size='24' font-weight='bold' fill='%23fff' text-anchor='middle'>NTS</text></svg>" type="image/svg+xml">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -24,140 +25,157 @@
       line-height: 1.4;
     }
 
-    /* Navbar */
-    header {
+    /* Floating Navigation Bubbles */
+    .nav-bubbles {
       position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 20px 24px;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .bubble {
       background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      padding: 12px 20px;
       color: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 100;
-      transition: all 0.3s ease;
-    }
-
-    header .nav-left {
-      font-weight: 400;
-      font-size: 16px;
-      letter-spacing: 0.5px;
-    }
-
-    header .nav-right {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-size: 14px;
       font-weight: 400;
-      transition: opacity 0.2s ease;
       letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+      white-space: nowrap;
     }
 
-    header .nav-right:hover {
-      opacity: 0.7;
+    .bubble:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     }
 
-    /* Slide-out Menu */
-    .menu {
-      position: fixed;
-      top: 0;
-      right: -320px;
-      width: 320px;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.7);
+    .bubble.logo {
+      font-weight: 700;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .bubble.logo:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Menu Dropdown */
+    .menu-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
-      color: #fff;
-      z-index: 200;
-      transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      padding: 0;
-      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px;
+      min-width: 200px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(0.95);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     }
 
-    .menu.open {
-      right: 0;
+    .menu-dropdown.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
     }
 
-    .menu-header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.3);
+    .menu-section {
+      margin-bottom: 20px;
     }
 
-    .menu-header .nav-left {
-      font-weight: 400;
-      font-size: 16px;
-      letter-spacing: 0.5px;
+    .menu-section:last-child {
+      margin-bottom: 0;
     }
 
-    .menu-content {
-      padding: 40px 24px;
+    .menu-section h3 {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .menu-links {
-      margin-bottom: 40px;
-    }
-
-    .menu-links div {
-      margin: 0 0 20px 0;
-      font-size: 18px;
-      cursor: pointer;
-      transition: opacity 0.2s ease;
-      display: flex;
-      align-items: center;
-      letter-spacing: 0.5px;
-    }
-
-    .menu-links div:hover {
-      opacity: 0.7;
-    }
-
-    .menu-links span {
-      margin-right: 16px;
-      color: #666;
-      font-size: 14px;
-      min-width: 24px;
-    }
-
-    .platform-links {
       list-style: none;
-      padding: 0;
       margin: 0;
+      padding: 0;
     }
 
-    .platform-links li {
-      margin: 0 0 16px 0;
+    .menu-links li {
+      margin: 0 0 8px 0;
     }
 
-    .platform-links a {
+    .menu-links li:last-child {
+      margin-bottom: 0;
+    }
+
+    .menu-links a {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
       color: #fff;
       text-decoration: none;
-      font-size: 16px;
-      transition: opacity 0.2s ease;
-      letter-spacing: 0.5px;
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
     }
 
-    .platform-links a:hover {
-      opacity: 0.7;
+    .menu-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(2px);
     }
 
-    .platform-links a i {
-      font-size: 18px;
-      min-width: 24px;
+    .menu-links a i {
+      font-size: 14px;
+      min-width: 16px;
       color: #ccc;
+    }
+
+    .nav-items {
+      margin-bottom: 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      font-size: 13px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-item span {
+      color: #666;
+      font-size: 11px;
+      min-width: 20px;
     }
 
     /* Hero */
@@ -214,33 +232,47 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
+    /* Logo Animation */
+    .bubble.logo {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bubble.logo::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .bubble.logo:hover::before {
+      left: 100%;
+    }
+
     /* Responsive */
     @media screen and (max-width: 768px) {
-      header {
-        padding: 16px 20px;
+      .nav-bubbles {
+        top: 16px;
+        right: 16px;
+        gap: 10px;
       }
 
-      header .nav-left,
-      .menu-header .nav-left {
-        font-size: 15px;
-      }
-
-      header .nav-right,
-      .menu-header .nav-right {
+      .bubble {
+        padding: 10px 16px;
         font-size: 13px;
       }
 
-      .menu {
-        right: -280px;
-        width: 280px;
-      }
-
-      .menu-content {
-        padding: 32px 20px;
-      }
-
-      .platform-links a {
+      .bubble.logo {
         font-size: 15px;
+      }
+
+      .menu-dropdown {
+        min-width: 180px;
+        right: -10px;
       }
 
       .icons {
@@ -265,20 +297,31 @@
         background-attachment: scroll;
       }
 
+      .nav-bubbles {
+        top: 12px;
+        right: 12px;
+      }
+
+      .bubble {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+
+      .bubble.logo {
+        font-size: 14px;
+      }
+
+      .menu-dropdown {
+        min-width: 160px;
+        right: -20px;
+      }
+
       .icons {
         gap: 16px;
       }
 
       .icons a {
         font-size: 22px;
-      }
-
-      .menu-links div {
-        font-size: 15px;
-      }
-
-      .platform-links a {
-        font-size: 14px;
       }
     }
 
@@ -299,49 +342,77 @@
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 255, 255, 0.3);
     }
+
+    /* Click outside overlay */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 99;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <header>
-    <div class="nav-left">Not the Singer</div>
-    <div class="nav-right" onclick="toggleMenu()">
+  <!-- Floating Navigation Bubbles -->
+  <div class="nav-bubbles">
+    <div class="bubble logo" onclick="goHome()">
+      NTS
+    </div>
+    <div class="bubble menu-trigger" onclick="toggleMenu()" id="menuTrigger">
       Menu <i class="fas fa-bars"></i>
     </div>
-  </header>
-  
-  <!-- Slide-out Menu -->
-  <div id="menu" class="menu">
-    <div class="menu-header">
-      <div class="nav-left">Menu</div>
-    </div>
-    <div class="menu-content">
-      <div class="menu-links">
-        <div><span>01</span> Music</div>
-        <div><span>02</span> Info</div>
+    
+    <!-- Menu Dropdown -->
+    <div class="menu-dropdown" id="menuDropdown">
+      <div class="menu-section">
+        <div class="nav-items">
+          <div class="nav-item">
+            <span>01</span> Music
+          </div>
+          <div class="nav-item">
+            <span>02</span> Info
+          </div>
+        </div>
       </div>
-      <ul class="platform-links">
-        <li><a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
-          <i class="fab fa-spotify"></i> Spotify
-        </a></li>
-        <li><a href="https://www.instagram.com/not_the_singer" target="_blank">
-          <i class="fab fa-instagram"></i> Instagram
-        </a></li>
-        <li><a href="https://notthesinger.bandcamp.com/" target="_blank">
-          <i class="fab fa-bandcamp"></i> Bandcamp
-        </a></li>
-        <li><a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
-          <i class="fab fa-apple"></i> Apple Music
-        </a></li>
-        <li><a href="https://soundcloud.com/not-the-singer" target="_blank">
-          <i class="fab fa-soundcloud"></i> SoundCloud
-        </a></li>
-        <li><a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
-          <i class="fab fa-youtube"></i> YouTube
-        </a></li>
-      </ul>
+      
+      <div class="menu-section">
+        <h3>Platforms</h3>
+        <ul class="menu-links">
+          <li><a href="https://open.spotify.com/artist/50imQLsQADUBJTKncqsb3I" target="_blank">
+            <i class="fab fa-spotify"></i> Spotify
+          </a></li>
+          <li><a href="https://www.instagram.com/not_the_singer" target="_blank">
+            <i class="fab fa-instagram"></i> Instagram
+          </a></li>
+          <li><a href="https://notthesinger.bandcamp.com/" target="_blank">
+            <i class="fab fa-bandcamp"></i> Bandcamp
+          </a></li>
+          <li><a href="https://music.apple.com/artist/not-the-singer/1597993257" target="_blank">
+            <i class="fab fa-apple"></i> Apple Music
+          </a></li>
+          <li><a href="https://soundcloud.com/not-the-singer" target="_blank">
+            <i class="fab fa-soundcloud"></i> SoundCloud
+          </a></li>
+          <li><a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
+            <i class="fab fa-youtube"></i> YouTube
+          </a></li>
+        </ul>
+      </div>
     </div>
   </div>
+
+  <!-- Click Outside Overlay -->
+  <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
   
   <!-- Hero Section -->
   <section class="hero">
@@ -375,23 +446,48 @@
   </section>
   
   <script>
+    let isMenuOpen = false;
+
     function toggleMenu() {
-      const menu = document.getElementById('menu');
-      menu.classList.toggle('open');
+      const dropdown = document.getElementById('menuDropdown');
+      const overlay = document.getElementById('menuOverlay');
+      const trigger = document.getElementById('menuTrigger');
+      
+      isMenuOpen = !isMenuOpen;
+      
+      if (isMenuOpen) {
+        dropdown.classList.add('open');
+        overlay.classList.add('active');
+        trigger.innerHTML = 'Close <i class="fas fa-times"></i>';
+      } else {
+        dropdown.classList.remove('open');
+        overlay.classList.remove('active');
+        trigger.innerHTML = 'Menu <i class="fas fa-bars"></i>';
+      }
     }
 
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-      const menu = document.getElementById('menu');
-      const menuTrigger = document.querySelector('.nav-right');
-      
-      if (!menu.contains(event.target) && !menuTrigger.contains(event.target)) {
-        menu.classList.remove('open');
+    function closeMenu() {
+      if (isMenuOpen) {
+        toggleMenu();
       }
+    }
+
+    function goHome() {
+      // Scroll to top or route to home page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // For future routing: window.location.href = '/';
+    }
+
+    // Close menu when clicking on menu items (optional)
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        console.log('Navigate to:', this.textContent.trim());
+        closeMenu();
+      });
     });
 
-    // Prevent menu from closing when clicking inside
-    document.getElementById('menu').addEventListener('click', function(event) {
+    // Prevent menu from closing when clicking inside dropdown
+    document.getElementById('menuDropdown').addEventListener('click', function(event) {
       event.stopPropagation();
     });
   </script>
