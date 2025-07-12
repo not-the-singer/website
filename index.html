@@ -197,28 +197,31 @@
     .overlay {
       background: linear-gradient(transparent 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.8) 100%);
       width: 100%;
-      padding: 60px 24px 40px;
+      padding: 60px 24px 60px;
       text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40vh;
     }
 
     .icons {
       display: flex;
       justify-content: center;
-      gap: 24px;
-      margin-bottom: 32px;
+      gap: 32px;
       flex-wrap: wrap;
     }
 
     .icons a {
       color: #fff;
-      font-size: 28px;
+      font-size: 32px;
       transition: all 0.3s ease;
       text-decoration: none;
-      opacity: 0.8;
+      opacity: 0.85;
     }
 
     .icons a:hover {
-      transform: scale(1.15);
+      transform: scale(1.2);
       opacity: 1;
     }
 
@@ -277,19 +280,15 @@
       }
 
       .icons {
-        gap: 20px;
+        gap: 24px;
       }
 
       .icons a {
-        font-size: 24px;
+        font-size: 28px;
       }
 
       .overlay {
-        padding: 40px 20px 32px;
-      }
-
-      .soundcloud-player {
-        max-width: 100%;
+        padding: 40px 20px 40px;
       }
     }
 
@@ -318,11 +317,11 @@
       }
 
       .icons {
-        gap: 16px;
+        gap: 20px;
       }
 
       .icons a {
-        font-size: 22px;
+        font-size: 26px;
       }
     }
 
@@ -437,11 +436,6 @@
         <a href="https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww" target="_blank">
           <i class="fab fa-youtube"></i>
         </a>
-      </div>
-      <div class="soundcloud-player">
-        <iframe width="100%" height="120" scrolling="no" frameborder="no" allow="autoplay"
-          src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/not-the-singer&color=%23161616&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true">
-        </iframe>
       </div>
     </div>
   </section>
