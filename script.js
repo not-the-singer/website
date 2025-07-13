@@ -20,8 +20,8 @@ async function fetchSpotifyAlbums() {
     const spotifyAlbums = await response.json();
     console.log('Raw Spotify data:', spotifyAlbums);
     
-    // Transform Spotify data to our format and add manual streaming links
-    albums = spotifyAlbums.map(album => ({
+    // Transform Spotify data to our format with automated streaming links
+    albums = await Promise.all(spotifyAlbums.map(async (album) => ({
       id: album.id,
       name: album.name,
       album_type: album.album_type,
@@ -30,9 +30,9 @@ async function fetchSpotifyAlbums() {
       total_tracks: album.total_tracks,
       images: album.images,
       external_urls: album.external_urls,
-      // Add your manual streaming links here
-      streaming_links: getStreamingLinksForAlbum(album.name, album.album_type)
-    }));
+      // Get automated streaming links
+      streaming_links: await searchAllPlatforms(album.name, 'Not the Singer')
+    })));
     
     // Sort by release date (newest first)
     albums.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
@@ -58,31 +58,68 @@ async function fetchSpotifyAlbums() {
   }
 }
 
-// Manual streaming links mapping (update these with your real links)
-function getStreamingLinksForAlbum(albumName, albumType) {
-  // You can customize this function to return different links for different albums
-  const baseLinks = {
-    apple: 'https://music.apple.com/artist/not-the-singer/1597993257',
-    bandcamp: 'https://notthesinger.bandcamp.com/',
-    soundcloud: 'https://soundcloud.com/not-the-singer',
-    youtube: 'https://www.youtube.com/channel/UCvb-OX6v2zdByJqrXveEGww',
-    deezer: 'https://deezer.com/artist/not-the-singer',
-    tidal: 'https://tidal.com/artist/not-the-singer',
-    amazonMusic: 'https://music.amazon.com/artist/not-the-singer'
+// Automated streaming platform search
+async function searchAllPlatforms(albumName, artistName) {
+  const platforms = {
+    spotify: await searchSpotify(albumName, artistName),
+    apple: await searchAppleMusic(albumName, artistName),
+    beatport: await searchBeatport(albumName, artistName),
+    bandcamp: await searchBandcamp(albumName, artistName),
+    soundcloud: await searchSoundCloud(albumName, artistName),
+    youtube: await searchYouTube(albumName, artistName),
+    deezer: await searchDeezer(albumName, artistName),
+    tidal: await searchTidal(albumName, artistName),
+    amazonMusic: await searchAmazonMusic(albumName, artistName),
+    traxsource: await searchTraxsource(albumName, artistName),
+    junodownload: await searchJunoDownload(albumName, artistName)
   };
   
-  // You can add specific links for specific albums here
-  if (albumName.toLowerCase().includes('perpetual motion')) {
-    return {
-      ...baseLinks,
-      bandcamp: 'https://notthesinger.bandcamp.com/album/perpetual-motion',
-      soundcloud: 'https://soundcloud.com/not-the-singer/sets/perpetual-motion'
-    };
-  }
-  
-  // Add more specific album mappings as needed
-  
-  return baseLinks;
+  return platforms;
+}
+
+// Individual search functions for each platform
+async function searchSpotify(album, artist) {
+  return `https://open.spotify.com/search/${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchAppleMusic(album, artist) {
+  return `https://music.apple.com/search?term=${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchBeatport(album, artist) {
+  return `https://www.beatport.com/search?q=${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchBandcamp(album, artist) {
+  return `https://bandcamp.com/search?q=${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchSoundCloud(album, artist) {
+  return `https://soundcloud.com/search?q=${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchYouTube(album, artist) {
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchDeezer(album, artist) {
+  return `https://www.deezer.com/search/${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchTidal(album, artist) {
+  return `https://tidal.com/search?q=${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchAmazonMusic(album, artist) {
+  return `https://music.amazon.com/search/${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchTraxsource(album, artist) {
+  return `https://www.traxsource.com/search?term=${encodeURIComponent(artist + ' ' + album)}`;
+}
+
+async function searchJunoDownload(album, artist) {
+  return `https://www.junodownload.com/search/?q%5Ball%5D=${encodeURIComponent(artist + ' ' + album)}`;
 }
 
 // Helper function to format date
@@ -214,20 +251,22 @@ function showAlbumDetail(album) {
   const formattedDate = formatDate(album.release_date);
   detailMeta.textContent = `${albumType} • ${trackInfo} • ${formattedDate}`;
   
-  // Create streaming links
+  // Create streaming links with all platforms including Beatport
   streamingLinks.innerHTML = '';
   
   const streamingPlatforms = [
-  { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify', url: album.external_urls?.spotify },
-  { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple', url: album.streaming_links?.apple },
-  { key: 'beatport', name: 'Beatport', icon: 'si si-beatport', url: album.streaming_links?.beatport },
-  { key: 'bandcamp', name: 'Bandcamp', icon: 'fab fa-bandcamp', url: album.streaming_links?.bandcamp },
-  { key: 'soundcloud', name: 'SoundCloud', icon: 'fab fa-soundcloud', url: album.streaming_links?.soundcloud },
-  { key: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', url: album.streaming_links?.youtube },
-  { key: 'deezer', name: 'Deezer', icon: 'fab fa-deezer', url: album.streaming_links?.deezer },
-  { key: 'tidal', name: 'Tidal', icon: 'si si-tidal', url: album.streaming_links?.tidal },
-  { key: 'amazonMusic', name: 'Amazon Music', icon: 'fab fa-amazon', url: album.streaming_links?.amazonMusic }
-];
+    { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify', url: album.external_urls?.spotify },
+    { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple', url: album.streaming_links?.apple },
+    { key: 'beatport', name: 'Beatport', icon: 'si si-beatport', url: album.streaming_links?.beatport },
+    { key: 'bandcamp', name: 'Bandcamp', icon: 'fab fa-bandcamp', url: album.streaming_links?.bandcamp },
+    { key: 'soundcloud', name: 'SoundCloud', icon: 'fab fa-soundcloud', url: album.streaming_links?.soundcloud },
+    { key: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', url: album.streaming_links?.youtube },
+    { key: 'deezer', name: 'Deezer', icon: 'fab fa-deezer', url: album.streaming_links?.deezer },
+    { key: 'tidal', name: 'Tidal', icon: 'si si-tidal', url: album.streaming_links?.tidal },
+    { key: 'amazonMusic', name: 'Amazon Music', icon: 'fab fa-amazon', url: album.streaming_links?.amazonMusic },
+    { key: 'traxsource', name: 'Traxsource', icon: 'fas fa-record-vinyl', url: album.streaming_links?.traxsource },
+    { key: 'junodownload', name: 'Juno Download', icon: 'fas fa-download', url: album.streaming_links?.junodownload }
+  ];
   
   streamingPlatforms.forEach(platform => {
     if (platform.url && platform.url !== '#') {
