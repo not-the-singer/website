@@ -545,7 +545,7 @@ body, html {
   }
 
   .floating-icons {
-    bottom: max(6vh, 40px);
+    bottom: max(15vh, 80px); /* Moved higher to ensure visibility */
     gap: 4vw;
     max-width: 95vw;
   }
@@ -555,7 +555,7 @@ body, html {
   }
 
   .overlay {
-    padding: 8vh 4vw;
+    padding: 8vh 4vw 20vh; /* Increased bottom padding for icon space */
   }
 
   .albums-container {
@@ -576,7 +576,7 @@ body, html {
   .streaming-links {
     grid-template-columns: 1fr;
     gap: 2vh;
-    margin-bottom: 8vh;
+    margin-bottom: 6vh; /* Reduced from 8vh */
   }
 }
 
@@ -625,7 +625,7 @@ body, html {
   }
 
   .floating-icons {
-    bottom: max(8vh, 60px);
+    bottom: max(18vh, 100px); /* Moved much higher for mobile */
     gap: 3vw;
     max-width: 92vw;
     overflow-x: auto;
@@ -644,7 +644,7 @@ body, html {
   }
 
   .overlay {
-    padding: 10vh 5vw;
+    padding: 10vh 5vw 25vh; /* Increased bottom padding significantly */
   }
 
   .albums-container {
@@ -657,7 +657,7 @@ body, html {
   }
 
   .album-detail {
-    padding: 15vh 5vw 25vh;
+    padding: 15vh 5vw 12vh; /* Reduced bottom padding */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     min-height: 100vh;
@@ -689,7 +689,7 @@ body, html {
   .streaming-links {
     grid-template-columns: 1fr;
     gap: 2.5vh;
-    margin-bottom: 15vh;
+    margin-bottom: 8vh; /* Reduced from 15vh */
     width: 100%;
     max-width: 100%;
   }
@@ -719,27 +719,44 @@ body, html {
 
 /* Extra small screens */
 @media screen and (max-width: 360px) {
-  .album-detail {
-    padding: 12vh 3vw 30vh;
+  .floating-icons {
+    bottom: max(20vh, 110px); /* Even higher for very small screens */
   }
 
-  .floating-icons {
-    bottom: max(10vh, 70px);
+  .overlay {
+    padding: 8vh 3vw 28vh; /* More bottom padding */
+  }
+
+  .album-detail {
+    padding: 12vh 3vw 10vh; /* Reduced bottom padding */
   }
 
   .music-page {
     padding: 6vh 3vw 15vh;
   }
+
+  .streaming-links {
+    margin-bottom: 6vh; /* Reduced */
+  }
 }
 
 /* Large phones and small tablets */
 @media screen and (min-width: 481px) and (max-width: 768px) {
+  .floating-icons {
+    bottom: max(12vh, 70px); /* Balanced positioning */
+  }
+
+  .overlay {
+    padding: 8vh 4vw 18vh; /* Balanced bottom padding */
+  }
+
   .album-detail {
-    padding: 12vh 6vw 20vh;
+    padding: 12vh 6vw 10vh; /* Reduced bottom padding */
   }
 
   .streaming-links {
     grid-template-columns: 1fr 1fr;
     gap: 2vh 3vw;
+    margin-bottom: 6vh; /* Reduced */
   }
 }
