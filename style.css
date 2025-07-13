@@ -411,9 +411,10 @@ body, html {
   background-size: cover;
   background-position: center;
   display: flex;
-  align-items: flex-start;
+  align-items: flex-start; /* Changed from center to flex-start */
   justify-content: center;
-  padding: 40px;
+  padding: 40px 20px 40px; /* Add bottom padding for scrolling */
+  overflow-y: auto; /* Add scrolling */
 }
 
 .album-detail.active {
