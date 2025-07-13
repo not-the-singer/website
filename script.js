@@ -111,10 +111,10 @@ function getSearchFallbackLinks(albumName) {
     apple: `https://music.apple.com/search?term=${fullQuery}`,
     beatport: `https://www.beatport.com/search?q=${fullQuery}`,
     bandcamp: `https://bandcamp.com/search?q=${fullQuery}`,
-    soundcloud: `https://soundcloud.com/search?q=${fullQuery}`,
+    soundcloud: `https://soundcloud.com/search?q=${fullQuery}`, // Search instead of artist page
     youtube: `https://www.youtube.com/results?search_query=${fullQuery}`,
     deezer: `https://www.deezer.com/en/search/${fullQuery}`,
-    tidal: `https://tidal.com/search?q=${fullQuery}` // Fixed: just tidal.com, not listen.tidal.com
+    tidal: `https://tidal.com/artist/23342714` // Direct artist page to avoid login
   };
 }
 
