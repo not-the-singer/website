@@ -470,13 +470,6 @@ body, html {
   margin-bottom: 40px;
 }
 
-.listen-section h3 {
-  font-size: 16px;
-  margin-bottom: 24px;
-  color: #fff;
-  letter-spacing: 0.5px;
-}
-
 .streaming-links {
   display: grid;
   grid-template-columns: 1fr 1fr;
