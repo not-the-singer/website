@@ -275,8 +275,8 @@ body, html {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0; /* Use right: 0 instead of width */
-  bottom: 0; /* Use bottom: 0 instead of height */
+  width: calc(100vw + 20px); /* Add extra width to cover scrollbar */
+  height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
