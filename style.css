@@ -545,7 +545,7 @@ right: -10px;
 }
 
 .floating-icons {
-bottom: 6vh;
+bottom: max(8vh, 60px);
 gap: 20px;
 max-width: 95vw;
 }
@@ -608,7 +608,7 @@ right: -15px;
 }
 
 .floating-icons {
-bottom: 8vh;
+bottom: max(6vh, 40px);
 gap: 16px;
 max-width: 98vw;
 overflow-x: auto;
