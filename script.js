@@ -55,7 +55,7 @@ async function fetchStreamingLinks(album) {
     const spotifyUrl = album.external_urls?.spotify;
     if (!spotifyUrl) {
       console.warn(`No Spotify URL for album: ${album.name}`);
-      return { beatport: searchBeatport(album.name, 'Not the Singer') };
+      return getSearchFallbackLinks(album.name);
     }
 
     console.log(`Fetching Songlink data for: ${album.name} - ${spotifyUrl}`);
@@ -71,10 +71,10 @@ async function fetchStreamingLinks(album) {
     
     const links = {};
 
+    // Extract available links from Songlink
     if (data.linksByPlatform) {
       const platforms = data.linksByPlatform;
       
-      // Map Songlink platform names to your platform keys
       if (platforms.spotify) links.spotify = platforms.spotify.url;
       if (platforms.appleMusic) links.apple = platforms.appleMusic.url;
       if (platforms.bandcamp) links.bandcamp = platforms.bandcamp.url;
@@ -84,20 +84,38 @@ async function fetchStreamingLinks(album) {
       }
       if (platforms.deezer) links.deezer = platforms.deezer.url;
       if (platforms.tidal) links.tidal = platforms.tidal.url;
+      if (platforms.beatport) links.beatport = platforms.beatport.url; // Future-proof for Beatport
     }
 
-    // Add Beatport search link (not available in Songlink)
-    links.beatport = searchBeatport(album.name, 'Not the Singer');
+    // Get fallback search URLs for missing platforms
+    const fallbackLinks = getSearchFallbackLinks(album.name);
+    
+    // Merge: use Songlink data if available, otherwise use search fallbacks
+    const finalLinks = { ...fallbackLinks, ...links };
 
-    console.log(`Processed links for ${album.name}:`, links);
-    return links;
+    console.log(`Final links for ${album.name}:`, finalLinks);
+    return finalLinks;
   } catch (error) {
     console.error(`Error fetching streaming links for ${album.name}:`, error);
-    return { beatport: searchBeatport(album.name, 'Not the Singer') };
+    // Return complete fallback if Songlink completely fails
+    return getSearchFallbackLinks(album.name);
   }
 }
-function searchBeatport(albumName, artistName) {
-  return `https://www.beatport.com/search?q=${encodeURIComponent(artistName + ' ' + albumName)}`;
+
+function getSearchFallbackLinks(albumName) {
+  const artistName = 'Not the Singer';
+  const searchQuery = encodeURIComponent(`${artistName} ${albumName}`);
+  
+  return {
+    spotify: `https://open.spotify.com/search/${searchQuery}`,
+    apple: `https://music.apple.com/search?term=${searchQuery}`,
+    beatport: `https://www.beatport.com/search?q=${searchQuery}`,
+    bandcamp: `https://bandcamp.com/search?q=${searchQuery}`,
+    soundcloud: `https://soundcloud.com/search?q=${searchQuery}`,
+    youtube: `https://www.youtube.com/results?search_query=${searchQuery}`,
+    deezer: `https://www.deezer.com/search/${searchQuery}`,
+    tidal: `https://tidal.com/search?q=${searchQuery}`
+  };
 }
 
 function formatDate(dateString) {
@@ -191,6 +209,7 @@ function showAlbumDetail(album) {
   const linksContainer = document.getElementById('streamingLinks');
   linksContainer.innerHTML = '';
 
+  // Updated platforms list (removed Amazon Music, kept even number)
   const streamingPlatforms = [
     { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify' },
     { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple' },
@@ -202,28 +221,28 @@ function showAlbumDetail(album) {
     { key: 'tidal', name: 'Tidal', icon: 'simple-icons-tidal' }
   ];
 
-    streamingPlatforms.forEach(platform => {
-      const url = album.streaming_links?.[platform.key];
-      if (url && url !== '#') {
-        const link = document.createElement('a');
-        link.href = url;
-        link.target = '_blank';
-        link.className = 'streaming-link';
-        
-        // Handle Simple Icons differently
-        let iconHTML;
-        if (platform.icon === 'simple-icons-beatport') {
-          iconHTML = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/beatport.svg" style="width: 18px; height: 18px; filter: invert(1);">`;
-        } else if (platform.icon === 'simple-icons-tidal') {
-          iconHTML = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/tidal.svg" style="width: 18px; height: 18px; filter: invert(1);">`;
-        } else {
-          iconHTML = `<i class="${platform.icon}"></i>`;
-        }
-        
-        link.innerHTML = `${iconHTML}<span>${platform.name}</span>`;
-        linksContainer.appendChild(link);
+  streamingPlatforms.forEach(platform => {
+    const url = album.streaming_links?.[platform.key];
+    if (url && url !== '#') {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.className = 'streaming-link';
+      
+      // Handle Simple Icons differently
+      let iconHTML;
+      if (platform.icon === 'simple-icons-beatport') {
+        iconHTML = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/beatport.svg" style="width: 18px; height: 18px; filter: invert(1);">`;
+      } else if (platform.icon === 'simple-icons-tidal') {
+        iconHTML = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/tidal.svg" style="width: 18px; height: 18px; filter: invert(1);">`;
+      } else {
+        iconHTML = `<i class="${platform.icon}"></i>`;
       }
-    });
+      
+      link.innerHTML = `${iconHTML}<span>${platform.name}</span>`;
+      linksContainer.appendChild(link);
+    }
+  });
 
   document.getElementById('musicPage').classList.remove('active');
   detail.classList.add('active');
