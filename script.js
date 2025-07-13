@@ -1,3 +1,5 @@
+// Revised script.js using Odesli for all platforms except Beatport search fallback
+
 let isMenuOpen = false;
 let isOnMusicPage = false;
 let isOnAlbumDetail = false;
@@ -13,15 +15,12 @@ async function fetchSpotifyAlbums() {
     const spotifyAlbums = await response.json();
 
     albums = await Promise.all(spotifyAlbums.map(async (album) => {
-      const streaming_links = await fetchStreamingLinks(album.external_urls.spotify);
-      streaming_links.beatport = await searchBeatport(album.name, album.artists[0].name);
-
+      const streaming_links = await getOdesliLinks(album.external_urls.spotify, album.name);
       return {
         id: album.id,
         name: album.name,
         album_type: album.album_type,
         release_date: album.release_date,
-        release_date_precision: album.release_date_precision,
         total_tracks: album.total_tracks,
         images: album.images,
         external_urls: album.external_urls,
@@ -30,7 +29,6 @@ async function fetchSpotifyAlbums() {
     }));
 
     albums.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
-
   } catch (error) {
     console.error('Error fetching Spotify albums:', error);
     albums = [
@@ -48,29 +46,25 @@ async function fetchSpotifyAlbums() {
   }
 }
 
-async function fetchStreamingLinks(spotifyUrl) {
+async function getOdesliLinks(spotifyUrl, albumName) {
   try {
-    const res = await fetch(`https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(spotifyUrl)}`);
-    const data = await res.json();
-    const links = data.linksByPlatform;
+    const response = await fetch(`https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(spotifyUrl)}`);
+    const data = await response.json();
+    const platforms = data.linksByPlatform || {};
 
-    return {
-      spotify: links.spotify?.url || null,
-      apple: links.appleMusic?.url || null,
-      bandcamp: links.bandcamp?.url || null,
-      soundcloud: links.soundcloud?.url || null,
-      youtube: links.youtube?.url || null,
-      deezer: links.deezer?.url || null,
-      tidal: links.tidal?.url || null
+    platforms.beatport = {
+      url: `https://www.beatport.com/search?q=${encodeURIComponent(albumName)}`
     };
-  } catch (err) {
-    console.error('Error fetching streaming links:', err);
-    return {};
-  }
-}
 
-async function searchBeatport(album, artist) {
-  return `https://www.beatport.com/search?q=${encodeURIComponent(artist + ' ' + album)}`;
+    return Object.fromEntries(
+      Object.entries(platforms).map(([key, val]) => [key, val.url])
+    );
+  } catch (err) {
+    console.error('Odesli error:', err);
+    return {
+      beatport: `https://www.beatport.com/search?q=${encodeURIComponent(albumName)}`
+    };
+  }
 }
 
 function formatDate(dateString) {
@@ -193,7 +187,7 @@ function showAlbumDetail(album) {
 
   const streamingPlatforms = [
     { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify' },
-    { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple' },
+    { key: 'appleMusic', name: 'Apple Music', icon: 'fab fa-apple' },
     { key: 'bandcamp', name: 'Bandcamp', icon: 'fab fa-bandcamp' },
     { key: 'beatport', name: 'Beatport', icon: 'si si-beatport' },
     { key: 'soundcloud', name: 'SoundCloud', icon: 'fab fa-soundcloud' },
@@ -203,7 +197,10 @@ function showAlbumDetail(album) {
   ];
 
   streamingPlatforms.forEach(platform => {
-    const url = album.streaming_links?.[platform.key];
+    const url = platform.key === 'spotify'
+      ? album.external_urls?.spotify
+      : album.streaming_links?.[platform.key];
+
     if (url) {
       const link = document.createElement('a');
       link.href = url;
@@ -227,30 +224,23 @@ function closeAlbumDetail() {
   }, 300);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   fetchSpotifyAlbums();
-
   document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function() {
-      if (this.textContent.trim().includes('Music')) {
-        showMusic();
-      } else {
-        closeMenu();
-      }
+    item.addEventListener('click', function () {
+      if (this.textContent.trim().includes('Music')) showMusic();
+      else closeMenu();
     });
   });
-
-  document.getElementById('menuDropdown').addEventListener('click', function(event) {
-    event.stopPropagation();
-  });
+  document.getElementById('menuDropdown').addEventListener('click', e => e.stopPropagation());
 });
 
-window.addEventListener('popstate', function() {
+window.addEventListener('popstate', function () {
   if (isOnAlbumDetail) closeAlbumDetail();
   else if (isOnMusicPage) goHome();
 });
 
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
   if (event.key === 'Escape') {
     if (isOnAlbumDetail) closeAlbumDetail();
     else if (isOnMusicPage) goHome();
