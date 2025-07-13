@@ -61,7 +61,7 @@ async function fetchStreamingLinks(album) {
 
     console.log(`Fetching Songlink data for: ${album.name} - ${spotifyUrl}`);
     
-    const songLinkResponse = await fetch(`https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(spotifyUrl)}`);
+    const songLinkResponse = await fetch(`${API_BASE_URL}/api/songlink?spotifyUrl=${encodeURIComponent(spotifyUrl)}`);
     
     if (!songLinkResponse.ok) {
       throw new Error(`Songlink API error: ${songLinkResponse.status}`);
