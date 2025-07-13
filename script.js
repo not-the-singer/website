@@ -104,17 +104,17 @@ async function fetchStreamingLinks(album) {
 
 function getSearchFallbackLinks(albumName) {
   const artistName = 'Not the Singer';
-  const searchQuery = encodeURIComponent(`${artistName} ${albumName}`);
+  const fullQuery = encodeURIComponent(`${artistName} ${albumName}`);
   
   return {
-    spotify: `https://open.spotify.com/search/${searchQuery}`,
-    apple: `https://music.apple.com/search?term=${searchQuery}`,
-    beatport: `https://www.beatport.com/search?q=${searchQuery}`,
-    bandcamp: `https://bandcamp.com/search?q=${searchQuery}`,
-    soundcloud: `https://soundcloud.com/search?q=${searchQuery}`,
-    youtube: `https://www.youtube.com/results?search_query=${searchQuery}`,
-    deezer: `https://www.deezer.com/search/${searchQuery}`,
-    tidal: `https://tidal.com/search?q=${searchQuery}`
+    spotify: `https://open.spotify.com/search/${fullQuery}`,
+    apple: `https://music.apple.com/search?term=${fullQuery}`,
+    beatport: `https://www.beatport.com/search?q=${fullQuery}`,
+    bandcamp: `https://bandcamp.com/search?q=${fullQuery}`,
+    soundcloud: `https://soundcloud.com/search?q=${fullQuery}`,
+    youtube: `https://www.youtube.com/results?search_query=${fullQuery}`,
+    deezer: `https://www.deezer.com/en/search/${fullQuery}`,
+    tidal: `https://tidal.com/search?q=${fullQuery}` // Fixed: just tidal.com, not listen.tidal.com
   };
 }
 
