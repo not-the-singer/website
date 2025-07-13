@@ -413,7 +413,7 @@ body, html {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 40px;
 }
 
 .album-detail.active {
