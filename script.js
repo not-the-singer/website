@@ -4,6 +4,7 @@ let isOnAlbumDetail = false;
 
 const API_BASE_URL = 'https://not-the-singer-api.vercel.app';
 let albums = [];
+let streamingLinksCache = {}; // Cache to store streaming links
 
 async function fetchSpotifyAlbums() {
   try {
@@ -12,17 +13,28 @@ async function fetchSpotifyAlbums() {
     const spotifyAlbums = await response.json();
 
     albums = await Promise.all(spotifyAlbums.map(async (album) => {
-      const links = await fetchStreamingLinks(album.name);
+      // Check if we already have cached links for this album
+      const cacheKey = `${album.id}_${album.name}`;
+      let streamingLinks;
+      
+      if (streamingLinksCache[cacheKey]) {
+        console.log(`Using cached links for: ${album.name}`);
+        streamingLinks = streamingLinksCache[cacheKey];
+      } else {
+        console.log(`Fetching new links for: ${album.name}`);
+        streamingLinks = await fetchStreamingLinks(album);
+        // Cache the result
+        streamingLinksCache[cacheKey] = streamingLinks;
+      }
+
       return {
         ...album,
-        streaming_links: {
-          ...links,
-          beatport: searchBeatport(album.name, album.artists?.[0]?.name || 'Not the Singer')
-        }
+        streaming_links: streamingLinks
       };
     }));
 
     albums.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
+    console.log('Processed albums with streaming links:', albums);
   } catch (error) {
     console.error('Spotify fetch failed:', error);
     albums = [{
@@ -38,32 +50,55 @@ async function fetchSpotifyAlbums() {
   }
 }
 
-async function fetchStreamingLinks(albumName) {
+async function fetchStreamingLinks(album) {
   try {
-    const encoded = encodeURIComponent(`${albumName} Not the Singer`);
-    const odesliRes = await fetch(`https://api.song.link/v1-alpha.1/links?url=https://open.spotify.com/album/${encoded}`);
-    const data = await odesliRes.json();
+    // Use the actual Spotify URL from the album data
+    const spotifyUrl = album.external_urls?.spotify;
+    if (!spotifyUrl) {
+      console.warn(`No Spotify URL for album: ${album.name}`);
+      return { beatport: searchBeatport(album.name, 'Not the Singer') };
+    }
+
+    console.log(`Fetching Songlink data for: ${album.name} - ${spotifyUrl}`);
+    
+    const songLinkResponse = await fetch(`https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(spotifyUrl)}`);
+    
+    if (!songLinkResponse.ok) {
+      throw new Error(`Songlink API error: ${songLinkResponse.status}`);
+    }
+    
+    const data = await songLinkResponse.json();
+    console.log(`Songlink response for ${album.name}:`, data);
+    
     const links = {};
 
+    // Extract links from Songlink API response
     if (data.linksByPlatform) {
-      const p = data.linksByPlatform;
-      if (p.spotify) links.spotify = p.spotify.url;
-      if (p.appleMusic) links.apple = p.appleMusic.url;
-      if (p.bandcamp) links.bandcamp = p.bandcamp.url;
-      if (p.soundcloud) links.soundcloud = p.soundcloud.url;
-      if (p.youtube) links.youtube = p.youtube.url;
-      if (p.deezer) links.deezer = p.deezer.url;
-      if (p.tidal) links.tidal = p.tidal.url;
+      const platforms = data.linksByPlatform;
+      
+      if (platforms.spotify) links.spotify = platforms.spotify.url;
+      if (platforms.appleMusic) links.apple = platforms.appleMusic.url;
+      if (platforms.bandcamp) links.bandcamp = platforms.bandcamp.url;
+      if (platforms.soundcloud) links.soundcloud = platforms.soundcloud.url;
+      if (platforms.youtube) links.youtube = platforms.youtube.url;
+      if (platforms.youtubeMusic) links.youtube = platforms.youtubeMusic.url; // Prefer YouTube Music
+      if (platforms.deezer) links.deezer = platforms.deezer.url;
+      if (platforms.tidal) links.tidal = platforms.tidal.url;
     }
+
+    // Add Beatport search link (not available in Songlink)
+    links.beatport = searchBeatport(album.name, 'Not the Singer');
+
     return links;
-  } catch (e) {
-    console.error('odesli error:', e);
-    return {};
+  } catch (error) {
+    console.error(`Error fetching streaming links for ${album.name}:`, error);
+    // Return at least Beatport link if Songlink fails
+    return { beatport: searchBeatport(album.name, 'Not the Singer') };
   }
 }
 
-function searchBeatport(album, artist) {
-  return `https://www.beatport.com/search?q=${encodeURIComponent(artist + ' ' + album)}`;
+function searchBeatport(albumName, artistName) {
+  return `https://www.beatport.com/search?q=${encodeURIComponent(artistName + ' ' + albumName)}`;
 }
 
 function formatDate(dateString) {
@@ -157,6 +192,7 @@ function showAlbumDetail(album) {
   const linksContainer = document.getElementById('streamingLinks');
   linksContainer.innerHTML = '';
 
+  // Updated platforms list (removed Amazon Music, kept even number)
   const streamingPlatforms = [
     { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify' },
     { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple' },
@@ -168,15 +204,15 @@ function showAlbumDetail(album) {
     { key: 'tidal', name: 'Tidal', icon: 'si si-tidal' }
   ];
 
-  streamingPlatforms.forEach(p => {
-    const url = album.streaming_links?.[p.key];
-    if (url) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.className = 'streaming-link';
-      a.innerHTML = `<i class="${p.icon}"></i><span>${p.name}</span>`;
-      linksContainer.appendChild(a);
+  streamingPlatforms.forEach(platform => {
+    const url = album.streaming_links?.[platform.key];
+    if (url && url !== '#') {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.className = 'streaming-link';
+      link.innerHTML = `<i class="${platform.icon}"></i><span>${platform.name}</span>`;
+      linksContainer.appendChild(link);
     }
   });
 
