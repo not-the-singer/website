@@ -579,10 +579,16 @@ body, html {
 }
 
 @media screen and (max-width: 480px) {
+  * {
+  max-width: 100vw;
+  box-sizing: border-box;
+  }
+  
   body, html {
-    overflow-x: hidden;
-    width: 100%;
-    max-width: 100vw;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  position: relative; /* Add this */
   }
 
   .hero {
@@ -645,10 +651,10 @@ body, html {
     gap: 20px;
   }
 
-  .album-detail {
-    padding: 80px 20px 60px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  .album-detail-content {
+  max-width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box; /* Add this */
   }
 
   .album-detail-content {
@@ -666,9 +672,11 @@ body, html {
   }
 
   .streaming-links {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin-bottom: 40px;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 60px; /* Increased from 40px */
+  width: 100%; /* Add this */
+  max-width: 100%; /* Add this */
   }
 
   .back-button {
