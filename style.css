@@ -320,7 +320,7 @@ body, html {
   display: flex;
   flex-direction: column;
   gap: 32px;
-  margin-top: 40px;
+  margin-top: 20px;
   max-width: 400px;
   margin-left: auto;
   margin-right: auto;
