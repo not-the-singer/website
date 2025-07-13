@@ -586,15 +586,19 @@ body, html {
     box-sizing: border-box;
   }
 
-  body, html {
-    overflow-x: hidden;
-    width: 100%;
-    max-width: 100vw;
-    position: relative;
+    body, html {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100vw;
+      position: relative;
+      overflow-y: hidden; /* Add this for mobile */
   }
 
   .hero {
     background-attachment: scroll;
+    overflow: hidden;
+    height: 100vh;
+    max-height: 100vh;
     min-height: 100vh;
   }
 
