@@ -264,13 +264,28 @@ body, html {
   overflow-y: auto;
   padding: 100px 20px 80px;
   
-  /* Hide scrollbar */
+  /* Hide all scroll indicators on Mac */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+  
+  /* Webkit specific for Mac */
+  -webkit-appearance: none;
+  -webkit-overflow-scrolling: auto;
 }
 
 .music-page::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+.music-page::-webkit-scrollbar-track {
+  display: none;
+}
+
+.music-page::-webkit-scrollbar-thumb {
+  display: none;
 }
 
 .music-page.active {
@@ -285,6 +300,8 @@ body, html {
   left: 0;
   width: 100vw;
   height: 100vh;
+  margin: 0;
+  padding: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
