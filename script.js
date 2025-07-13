@@ -192,29 +192,39 @@ function showAlbumDetail(album) {
   const linksContainer = document.getElementById('streamingLinks');
   linksContainer.innerHTML = '';
 
-  // Updated platforms list (removed Amazon Music, kept even number)
   const streamingPlatforms = [
     { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify' },
     { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple' },
-    { key: 'beatport', name: 'Beatport', icon: 'si si-beatport' },
+    { key: 'beatport', name: 'Beatport', icon: 'simple-icons-beatport' },
     { key: 'bandcamp', name: 'Bandcamp', icon: 'fab fa-bandcamp' },
     { key: 'soundcloud', name: 'SoundCloud', icon: 'fab fa-soundcloud' },
     { key: 'youtube', name: 'YouTube', icon: 'fab fa-youtube' },
     { key: 'deezer', name: 'Deezer', icon: 'fab fa-deezer' },
-    { key: 'tidal', name: 'Tidal', icon: 'si si-tidal' }
+    { key: 'tidal', name: 'Tidal', icon: 'simple-icons-tidal' }
   ];
 
-  streamingPlatforms.forEach(platform => {
-    const url = album.streaming_links?.[platform.key];
-    if (url && url !== '#') {
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.className = 'streaming-link';
-      link.innerHTML = `<i class="${platform.icon}"></i><span>${platform.name}</span>`;
-      linksContainer.appendChild(link);
-    }
-  });
+    streamingPlatforms.forEach(platform => {
+      const url = album.streaming_links?.[platform.key];
+      if (url && url !== '#') {
+        const link = document.createElement('a');
+        link.href = url;
+        link.target = '_blank';
+        link.className = 'streaming-link';
+        
+        // Handle Simple Icons differently
+        let iconHTML;
+        if (platform.icon === 'simple-icons-beatport') {
+          iconHTML = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/beatport.svg" style="width: 18px; height: 18px; filter: invert(1);">`;
+        } else if (platform.icon === 'simple-icons-tidal') {
+          iconHTML = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/tidal.svg" style="width: 18px; height: 18px; filter: invert(1);">`;
+        } else {
+          iconHTML = `<i class="${platform.icon}"></i>`;
+        }
+        
+        link.innerHTML = `${iconHTML}<span>${platform.name}</span>`;
+        linksContainer.appendChild(link);
+      }
+    });
 
   document.getElementById('musicPage').classList.remove('active');
   detail.classList.add('active');
