@@ -545,7 +545,7 @@ body, html {
 
   .bubble {
     padding: clamp(8px, 1.5vh, 16px) clamp(12px, 4vw, 24px);
-    font-size: clamp(11px, 2.5vw, 16px);
+    font-size: clamp(11px, 3vw, 16px);
   }
 
   .bubble.logo {
@@ -664,7 +664,7 @@ body, html {
     top: clamp(16px, 3vh, 24px);
     left: clamp(16px, 3vw, 24px);
     padding: clamp(8px, 1.5vh, 16px) clamp(12px, 4vw, 24px); /* Same as .bubble */
-    font-size: clamp(11px, 2.5vw, 16px); /* Same as .bubble */
+    font-size: clamp(11px, 3vw, 16px); /* Same as .bubble */
   }
 
 /* Only prevent scrolling on home page for small screens */
