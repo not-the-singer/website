@@ -52,7 +52,6 @@ async function fetchSpotifyAlbums() {
 
 async function fetchStreamingLinks(album) {
   try {
-    // Use the actual Spotify URL from the album data
     const spotifyUrl = album.external_urls?.spotify;
     if (!spotifyUrl) {
       console.warn(`No Spotify URL for album: ${album.name}`);
@@ -72,16 +71,17 @@ async function fetchStreamingLinks(album) {
     
     const links = {};
 
-    // Extract links from Songlink API response
     if (data.linksByPlatform) {
       const platforms = data.linksByPlatform;
       
+      // Map Songlink platform names to your platform keys
       if (platforms.spotify) links.spotify = platforms.spotify.url;
       if (platforms.appleMusic) links.apple = platforms.appleMusic.url;
       if (platforms.bandcamp) links.bandcamp = platforms.bandcamp.url;
       if (platforms.soundcloud) links.soundcloud = platforms.soundcloud.url;
-      if (platforms.youtube) links.youtube = platforms.youtube.url;
-      if (platforms.youtubeMusic) links.youtube = platforms.youtubeMusic.url; // Prefer YouTube Music
+      if (platforms.youtube || platforms.youtubeMusic) {
+        links.youtube = platforms.youtubeMusic?.url || platforms.youtube?.url;
+      }
       if (platforms.deezer) links.deezer = platforms.deezer.url;
       if (platforms.tidal) links.tidal = platforms.tidal.url;
     }
@@ -89,14 +89,13 @@ async function fetchStreamingLinks(album) {
     // Add Beatport search link (not available in Songlink)
     links.beatport = searchBeatport(album.name, 'Not the Singer');
 
+    console.log(`Processed links for ${album.name}:`, links);
     return links;
   } catch (error) {
     console.error(`Error fetching streaming links for ${album.name}:`, error);
-    // Return at least Beatport link if Songlink fails
     return { beatport: searchBeatport(album.name, 'Not the Singer') };
   }
 }
-
 function searchBeatport(albumName, artistName) {
   return `https://www.beatport.com/search?q=${encodeURIComponent(artistName + ' ' + albumName)}`;
 }
