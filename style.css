@@ -272,11 +272,11 @@ body, html {
 
 .music-page::before {
   content: '';
-  position: fixed; /* Back to fixed */
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100vw; /* Changed to 100vw to cover full width */
-  height: 100vh; /* Back to 100vh */
+  right: 0; /* Use right: 0 instead of width */
+  bottom: 0; /* Use bottom: 0 instead of height */
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
