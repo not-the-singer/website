@@ -263,6 +263,14 @@ body, html {
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
   padding: 100px 20px 80px;
+  
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.music-page::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .music-page.active {
@@ -275,7 +283,7 @@ body, html {
   position: fixed;
   top: 0;
   left: 0;
-  width: calc(100vw + 20px); /* Add extra width to cover scrollbar */
+  width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(15px);
