@@ -218,15 +218,16 @@ function showAlbumDetail(album) {
   streamingLinks.innerHTML = '';
   
   const streamingPlatforms = [
-    { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify', url: album.external_urls?.spotify },
-    { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple', url: album.streaming_links?.apple },
-    { key: 'bandcamp', name: 'Bandcamp', icon: 'fab fa-bandcamp', url: album.streaming_links?.bandcamp },
-    { key: 'soundcloud', name: 'SoundCloud', icon: 'fab fa-soundcloud', url: album.streaming_links?.soundcloud },
-    { key: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', url: album.streaming_links?.youtube },
-    { key: 'deezer', name: 'Deezer', icon: 'fab fa-deezer', url: album.streaming_links?.deezer },
-    { key: 'tidal', name: 'Tidal', icon: 'fas fa-music', url: album.streaming_links?.tidal },
-    { key: 'amazonMusic', name: 'Amazon Music', icon: 'fab fa-amazon', url: album.streaming_links?.amazonMusic }
-  ];
+  { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify', url: album.external_urls?.spotify },
+  { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple', url: album.streaming_links?.apple },
+  { key: 'beatport', name: 'Beatport', icon: 'si si-beatport', url: album.streaming_links?.beatport },
+  { key: 'bandcamp', name: 'Bandcamp', icon: 'fab fa-bandcamp', url: album.streaming_links?.bandcamp },
+  { key: 'soundcloud', name: 'SoundCloud', icon: 'fab fa-soundcloud', url: album.streaming_links?.soundcloud },
+  { key: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', url: album.streaming_links?.youtube },
+  { key: 'deezer', name: 'Deezer', icon: 'fab fa-deezer', url: album.streaming_links?.deezer },
+  { key: 'tidal', name: 'Tidal', icon: 'si si-tidal', url: album.streaming_links?.tidal },
+  { key: 'amazonMusic', name: 'Amazon Music', icon: 'fab fa-amazon', url: album.streaming_links?.amazonMusic }
+];
   
   streamingPlatforms.forEach(platform => {
     if (platform.url && platform.url !== '#') {
