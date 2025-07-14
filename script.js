@@ -82,9 +82,8 @@ async function fetchAllMusic() {
     
     const spotifyAlbums = spotifyResponse.ok ? await spotifyResponse.json() : [];
     
-    // Extract all Spotify track names for duplicate checking
-    const spotifyTrackNames = spotifyAlbums.flatMap(album => 
-      album.tracks ? album.tracks.map(track => track.name) : [album.name]
+    // Extract all Spotify album names for duplicate checking
+    const spotifyTrackNames = spotifyAlbums.map(album => album.name);
     );
     
     // Now fetch SoundCloud tracks with duplicate filtering
