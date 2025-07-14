@@ -73,7 +73,13 @@
   <!-- Music Page -->
   <div class="music-page" id="musicPage">
     <div class="albums-container">
-      <div class="album-grid" id="albumGrid"></div>
+      <div class="filter-controls">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="album">Albums</button>
+        <button class="filter-btn" data-filter="remix">Remixes</button>
+        <button class="filter-btn" data-filter="mix">Mixes</button>
+      </div>
+      <div id="albumGrid" class="album-grid">
     </div>
   </div>
 
