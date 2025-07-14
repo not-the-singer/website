@@ -375,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('popstate', () => {
+  console.log('popstate fired; isOnAlbumDetail:', isOnAlbumDetail);
   if (isOnAlbumDetail) closeAlbumDetail();
   else if (isOnMusicPage) goHome();
 });
