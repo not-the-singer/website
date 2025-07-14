@@ -9,12 +9,12 @@ let streamingLinksCache = {}; // Cache to store streaming links
 // SoundCloud API configuration
 const SOUNDCLOUD_CLIENT_ID = 'vEx486GxbqAU2g0jtqYm3Vro4Lfc3Aty';
 
-// Fetch SoundCloud tracks
+// Fetch SoundCloud tracks via your API proxy
 async function fetchSoundCloudTracks() {
   try {
-    console.log('Fetching tracks from SoundCloud API...');
+    console.log('Fetching tracks from SoundCloud via API proxy...');
     
-    const response = await fetch(`https://api.soundcloud.com/users/not-the-singer/tracks?client_id=${SOUNDCLOUD_CLIENT_ID}&limit=50`);
+    const response = await fetch(`${API_BASE_URL}/api/soundcloud`);
     
     if (!response.ok) {
       throw new Error(`SoundCloud API responded with status: ${response.status}`);
@@ -199,6 +199,35 @@ function showMusic() {
   closeMenu();
 }
 
+// Filter functionality
+let currentFilter = 'all';
+
+function setupFilters() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      currentFilter = button.dataset.filter;
+      loadAlbums();
+    });
+  });
+}
+
+function getFilteredAlbums() {
+  if (currentFilter === 'all') {
+    return albums;
+  }
+  
+  return albums.filter(album => {
+    if (currentFilter === 'album') {
+      return album.source === 'spotify' || album.album_type === 'album';
+    }
+    return album.album_type === currentFilter;
+  });
+}
+
 function loadAlbums() {
   const grid = document.getElementById('albumGrid');
   grid.innerHTML = '';
@@ -323,37 +352,4 @@ document.addEventListener('keydown', e => {
     else if (isOnMusicPage) goHome();
     else if (isMenuOpen) closeMenu();
   }
-// Filter functionality
-let currentFilter = 'all';
-
-function setupFilters() {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  
-  filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      filterButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-      currentFilter = button.dataset.filter;
-      loadAlbums();
-    });
-  });
-}
-
-function getFilteredAlbums() {
-  if (currentFilter === 'all') {
-    return albums;
-  }
-  
-  return albums.filter(album => {
-    if (currentFilter === 'album') {
-      return album.source === 'spotify' || album.album_type === 'album';
-    }
-    return album.album_type === currentFilter;
-  });
-}
-
-
-
-
-  
 });
