@@ -6,47 +6,81 @@ const API_BASE_URL = 'https://not-the-singer-api.vercel.app';
 let albums = [];
 let streamingLinksCache = {}; // Cache to store streaming links
 
-async function fetchSpotifyAlbums() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/spotify`);
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
-    const spotifyAlbums = await response.json();
+// SoundCloud API configuration
+const SOUNDCLOUD_CLIENT_ID = 'vEx486GxbqAU2g0jtqYm3Vro4Lfc3Aty';
 
-    albums = await Promise.all(spotifyAlbums.map(async (album) => {
-      // Check if we already have cached links for this album
+// Fetch SoundCloud tracks
+async function fetchSoundCloudTracks() {
+  try {
+    console.log('Fetching tracks from SoundCloud API...');
+    
+    const response = await fetch(`https://api.soundcloud.com/users/not-the-singer/tracks?client_id=${SOUNDCLOUD_CLIENT_ID}&limit=50`);
+    
+    if (!response.ok) {
+      throw new Error(`SoundCloud API responded with status: ${response.status}`);
+    }
+    
+    const tracks = await response.json();
+    console.log('Raw SoundCloud data:', tracks);
+    
+    return tracks.map(track => ({
+      id: `sc_${track.id}`,
+      name: track.title,
+      album_type: track.title.toLowerCase().includes('mix') ? 'mix' : 'remix',
+      release_date: track.created_at.split('T')[0],
+      total_tracks: 1,
+      images: [{ url: track.artwork_url || track.user.avatar_url }],
+      external_urls: { soundcloud: track.permalink_url },
+      streaming_links: {
+        soundcloud: track.permalink_url
+      },
+      source: 'soundcloud'
+    }));
+  } catch (error) {
+    console.error('Error fetching SoundCloud tracks:', error);
+    return [];
+  }
+}
+
+async function fetchAllMusic() {
+  try {
+    console.log('Fetching all music from Spotify and SoundCloud...');
+    
+    const [spotifyResponse, soundcloudTracks] = await Promise.all([
+      fetch(`${API_BASE_URL}/api/spotify`),
+      fetchSoundCloudTracks()
+    ]);
+    
+    const spotifyAlbums = spotifyResponse.ok ? await spotifyResponse.json() : [];
+    
+    // Process Spotify albums (with streaming links)
+    const processedSpotifyAlbums = await Promise.all(spotifyAlbums.map(async (album) => {
       const cacheKey = `${album.id}_${album.name}`;
       let streamingLinks;
       
       if (streamingLinksCache[cacheKey]) {
-        console.log(`Using cached links for: ${album.name}`);
         streamingLinks = streamingLinksCache[cacheKey];
       } else {
-        console.log(`Fetching new links for: ${album.name}`);
         streamingLinks = await fetchStreamingLinks(album);
-        // Cache the result
         streamingLinksCache[cacheKey] = streamingLinks;
       }
 
       return {
         ...album,
-        streaming_links: streamingLinks
+        streaming_links: streamingLinks,
+        source: 'spotify'
       };
     }));
-
-    albums.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
-    console.log('Processed albums with streaming links:', albums);
+    
+    // Combine all music
+    albums = [...processedSpotifyAlbums, ...soundcloudTracks]
+      .sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
+    
+    console.log('All music loaded:', albums);
+    
   } catch (error) {
-    console.error('Spotify fetch failed:', error);
-    albums = [{
-      id: 'fallback',
-      name: 'Offline',
-      album_type: 'single',
-      release_date: '2024-01-01',
-      total_tracks: 1,
-      images: [{ url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=640&h=640&fit=crop' }],
-      external_urls: { spotify: '#' },
-      streaming_links: {}
-    }];
+    console.error('Error fetching all music:', error);
+    albums = [];
   }
 }
 
@@ -160,6 +194,7 @@ function showMusic() {
     loadAlbums();
     document.getElementById('musicPage').classList.add('active');
     isOnMusicPage = true;
+    setupFilters(); 
   }, 300);
   closeMenu();
 }
@@ -173,7 +208,14 @@ function loadAlbums() {
     return;
   }
 
-  albums.forEach(album => {
+const filteredAlbums = getFilteredAlbums();
+
+if (filteredAlbums.length === 0) {
+  grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No items found...</div>';
+  return;
+}
+
+filteredAlbums.forEach(album => {
     const card = document.createElement('div');
     card.className = 'album-card';
     card.onclick = () => showAlbumDetail(album);
@@ -258,7 +300,7 @@ function closeAlbumDetail() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  fetchSpotifyAlbums();
+  fetchAllMusic();
 
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -281,4 +323,37 @@ document.addEventListener('keydown', e => {
     else if (isOnMusicPage) goHome();
     else if (isMenuOpen) closeMenu();
   }
+// Filter functionality
+let currentFilter = 'all';
+
+function setupFilters() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      currentFilter = button.dataset.filter;
+      loadAlbums();
+    });
+  });
+}
+
+function getFilteredAlbums() {
+  if (currentFilter === 'all') {
+    return albums;
+  }
+  
+  return albums.filter(album => {
+    if (currentFilter === 'album') {
+      return album.source === 'spotify' || album.album_type === 'album';
+    }
+    return album.album_type === currentFilter;
+  });
+}
+
+
+
+
+  
 });
