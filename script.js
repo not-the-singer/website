@@ -6,39 +6,27 @@ const API_BASE_URL = 'https://not-the-singer-api.vercel.app';
 let albums = [];
 let streamingLinksCache = {}; // Cache to store streaming links
 
-// SoundCloud API configuration
-const SOUNDCLOUD_CLIENT_ID = 'vEx486GxbqAU2g0jtqYm3Vro4Lfc3Aty';
-
-// Better categorization logic based on duration
+// Simplified categorization based on duration
 function determineTrackType(title, duration) {
-  // Convert duration from milliseconds to minutes
   const durationMinutes = duration / 1000 / 60;
-  
-  // If over 15 minutes, it's a mix
-  if (durationMinutes > 15) return 'mix';
-  
-  // Everything else is a remix
-  return 'remix';
+  return durationMinutes > 15 ? 'mix' : 'remix';
 }
 
 // High quality artwork
 function getHighQualityArtwork(track) {
   if (track.artwork_url) {
-    // Replace 'large' with 't500x500' for higher quality
     return track.artwork_url.replace('-large.jpg', '-t500x500.jpg');
   }
   
-  // Fallback to user avatar if no artwork
   if (track.user && track.user.avatar_url) {
     return track.user.avatar_url.replace('-large.jpg', '-t500x500.jpg');
   }
   
-  // Ultimate fallback
   return 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=500&fit=crop';
 }
 
-// Fetch SoundCloud tracks
-async function fetchSoundCloudTracks() {
+// Fetch SoundCloud tracks with duplicate filtering
+async function fetchSoundCloudTracks(spotifyTrackNames) {
   try {
     console.log('Fetching tracks from SoundCloud via API proxy...');
     
@@ -51,23 +39,17 @@ async function fetchSoundCloudTracks() {
     const tracks = await response.json();
     console.log('Raw SoundCloud data:', tracks);
     
-    // Filter to only include public tracks that are actual remixes/mixes
+    // Filter to only include public tracks that aren't duplicates of Spotify
     const filteredTracks = tracks.filter(track => {
-      const title = track.title.toLowerCase();
-      
       // Skip private tracks
       if (track.sharing === 'private') return false;
       
-      // Skip if it's an original track that's already on Spotify
-      const isOriginal = !title.includes('remix') && 
-                        !title.includes('rework') && 
-                        !title.includes('mix') && 
-                        !title.includes('flip') && 
-                        !title.includes('vip');
+      // Skip if track name matches any Spotify track
+      const isDuplicate = spotifyTrackNames.some(spotifyName => 
+        spotifyName.toLowerCase() === track.title.toLowerCase()
+      );
       
-      if (isOriginal) return false;
-      
-      return true;
+      return !isDuplicate;
     });
     
     return filteredTracks.map(track => ({
@@ -89,16 +71,24 @@ async function fetchSoundCloudTracks() {
   }
 }
 
+// Combined fetch function
 async function fetchAllMusic() {
   try {
     console.log('Fetching all music from Spotify and SoundCloud...');
     
-    const [spotifyResponse, soundcloudTracks] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/spotify`),
-      fetchSoundCloudTracks()
+    const [spotifyResponse] = await Promise.all([
+      fetch(`${API_BASE_URL}/api/spotify`)
     ]);
     
     const spotifyAlbums = spotifyResponse.ok ? await spotifyResponse.json() : [];
+    
+    // Extract all Spotify track names for duplicate checking
+    const spotifyTrackNames = spotifyAlbums.flatMap(album => 
+      album.tracks ? album.tracks.map(track => track.name) : [album.name]
+    );
+    
+    // Now fetch SoundCloud tracks with duplicate filtering
+    const soundcloudTracks = await fetchSoundCloudTracks(spotifyTrackNames);
     
     // Process Spotify albums (with streaming links)
     const processedSpotifyAlbums = await Promise.all(spotifyAlbums.map(async (album) => {
@@ -185,17 +175,17 @@ async function fetchStreamingLinks(album) {
 
 function getSearchFallbackLinks(albumName) {
   const artistName = 'Not the Singer';
-  const fullQuery = encodeURIComponent(`${artistName} ${albumName}`);
+  const searchQuery = encodeURIComponent(`${artistName} ${albumName}`);
   
   return {
-    spotify: `https://open.spotify.com/search/${fullQuery}`,
-    apple: `https://music.apple.com/search?term=${fullQuery}`,
-    beatport: `https://www.beatport.com/search?q=${fullQuery}`,
-    bandcamp: `https://bandcamp.com/search?q=${fullQuery}`,
-    soundcloud: `https://soundcloud.com/search?q=${fullQuery}`, // Search instead of artist page
-    youtube: `https://www.youtube.com/results?search_query=${fullQuery}`,
-    deezer: `https://www.deezer.com/en/search/${fullQuery}`,
-    tidal: `https://tidal.com/artist/23342714` // Direct artist page to avoid login
+    spotify: `https://open.spotify.com/search/${searchQuery}`,
+    apple: `https://music.apple.com/search?term=${searchQuery}`,
+    beatport: `https://www.beatport.com/search?q=${searchQuery}`,
+    bandcamp: `https://bandcamp.com/search?q=${searchQuery}`,
+    soundcloud: `https://soundcloud.com/search?q=${searchQuery}`,
+    youtube: `https://www.youtube.com/results?search_query=${searchQuery}`,
+    deezer: `https://www.deezer.com/en/search/${searchQuery}`,
+    tidal: `https://tidal.com/artist/23342714`
   };
 }
 
@@ -205,7 +195,38 @@ function formatDate(dateString) {
 }
 
 function getAlbumTypeDisplay(type, tracks) {
-  return type === 'single' ? (tracks > 1 ? 'EP' : 'Single') : 'Album';
+  return type === 'single' ? (tracks > 1 ? 'EP' : 'Single') : 
+         type === 'remix' ? 'Remix' :
+         type === 'mix' ? 'Mix' : 'Album';
+}
+
+// Filter functionality
+let currentFilter = 'all';
+
+function setupFilters() {
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      filterButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      currentFilter = button.dataset.filter;
+      loadAlbums();
+    });
+  });
+}
+
+function getFilteredAlbums() {
+  if (currentFilter === 'all') {
+    return albums;
+  }
+  
+  return albums.filter(album => {
+    if (currentFilter === 'album') {
+      return album.source === 'spotify' || album.album_type === 'album';
+    }
+    return album.album_type === currentFilter;
+  });
 }
 
 function toggleMenu() {
@@ -241,57 +262,23 @@ function showMusic() {
     loadAlbums();
     document.getElementById('musicPage').classList.add('active');
     isOnMusicPage = true;
-    setupFilters(); 
+    setupFilters();
   }, 300);
   closeMenu();
-}
-
-// Filter functionality
-let currentFilter = 'all';
-
-function setupFilters() {
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  
-  filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      filterButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-      currentFilter = button.dataset.filter;
-      loadAlbums();
-    });
-  });
-}
-
-function getFilteredAlbums() {
-  if (currentFilter === 'all') {
-    return albums;
-  }
-  
-  return albums.filter(album => {
-    if (currentFilter === 'album') {
-      return album.source === 'spotify' || album.album_type === 'album';
-    }
-    return album.album_type === currentFilter;
-  });
 }
 
 function loadAlbums() {
   const grid = document.getElementById('albumGrid');
   grid.innerHTML = '';
 
-  if (albums.length === 0) {
-    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">Loading albums...</div>';
+  const filteredAlbums = getFilteredAlbums();
+
+  if (filteredAlbums.length === 0) {
+    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No items found...</div>';
     return;
   }
 
-const filteredAlbums = getFilteredAlbums();
-
-if (filteredAlbums.length === 0) {
-  grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No items found...</div>';
-  return;
-}
-
-filteredAlbums.forEach(album => {
+  filteredAlbums.forEach(album => {
     const card = document.createElement('div');
     card.className = 'album-card';
     card.onclick = () => showAlbumDetail(album);
