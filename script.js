@@ -9,7 +9,35 @@ let streamingLinksCache = {}; // Cache to store streaming links
 // SoundCloud API configuration
 const SOUNDCLOUD_CLIENT_ID = 'vEx486GxbqAU2g0jtqYm3Vro4Lfc3Aty';
 
-// Fetch SoundCloud tracks via your API proxy
+// Better categorization logic based on duration
+function determineTrackType(title, duration) {
+  // Convert duration from milliseconds to minutes
+  const durationMinutes = duration / 1000 / 60;
+  
+  // If over 15 minutes, it's a mix
+  if (durationMinutes > 15) return 'mix';
+  
+  // Everything else is a remix
+  return 'remix';
+}
+
+// High quality artwork
+function getHighQualityArtwork(track) {
+  if (track.artwork_url) {
+    // Replace 'large' with 't500x500' for higher quality
+    return track.artwork_url.replace('-large.jpg', '-t500x500.jpg');
+  }
+  
+  // Fallback to user avatar if no artwork
+  if (track.user && track.user.avatar_url) {
+    return track.user.avatar_url.replace('-large.jpg', '-t500x500.jpg');
+  }
+  
+  // Ultimate fallback
+  return 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=500&fit=crop';
+}
+
+// Fetch SoundCloud tracks
 async function fetchSoundCloudTracks() {
   try {
     console.log('Fetching tracks from SoundCloud via API proxy...');
@@ -23,13 +51,32 @@ async function fetchSoundCloudTracks() {
     const tracks = await response.json();
     console.log('Raw SoundCloud data:', tracks);
     
-    return tracks.map(track => ({
+    // Filter to only include public tracks that are actual remixes/mixes
+    const filteredTracks = tracks.filter(track => {
+      const title = track.title.toLowerCase();
+      
+      // Skip private tracks
+      if (track.sharing === 'private') return false;
+      
+      // Skip if it's an original track that's already on Spotify
+      const isOriginal = !title.includes('remix') && 
+                        !title.includes('rework') && 
+                        !title.includes('mix') && 
+                        !title.includes('flip') && 
+                        !title.includes('vip');
+      
+      if (isOriginal) return false;
+      
+      return true;
+    });
+    
+    return filteredTracks.map(track => ({
       id: `sc_${track.id}`,
       name: track.title,
-      album_type: track.title.toLowerCase().includes('mix') ? 'mix' : 'remix',
+      album_type: determineTrackType(track.title, track.duration),
       release_date: track.created_at.split('T')[0],
       total_tracks: 1,
-      images: [{ url: track.artwork_url || track.user.avatar_url }],
+      images: [{ url: getHighQualityArtwork(track) }],
       external_urls: { soundcloud: track.permalink_url },
       streaming_links: {
         soundcloud: track.permalink_url
