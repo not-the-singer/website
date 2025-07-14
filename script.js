@@ -84,7 +84,6 @@ async function fetchAllMusic() {
     
     // Extract all Spotify album names for duplicate checking
     const spotifyTrackNames = spotifyAlbums.map(album => album.name);
-    );
     
     // Now fetch SoundCloud tracks with duplicate filtering
     const soundcloudTracks = await fetchSoundCloudTracks(spotifyTrackNames);
@@ -372,12 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('menuDropdown').addEventListener('click', e => e.stopPropagation());
-});
-
-window.addEventListener('popstate', () => {
-  console.log('popstate fired; isOnAlbumDetail:', isOnAlbumDetail);
-  if (isOnAlbumDetail) closeAlbumDetail();
-  else if (isOnMusicPage) goHome();
 });
 
 document.addEventListener('keydown', e => {
