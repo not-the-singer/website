@@ -350,6 +350,11 @@ function showAlbumDetail(album) {
   document.getElementById('musicPage').classList.remove('active');
   detail.classList.add('active');
   isOnAlbumDetail = true;
+
+    console.log('Album detail opened, isOnAlbumDetail:', isOnAlbumDetail);
+  setTimeout(() => {
+    console.log('After 2 seconds - still active?', detail.classList.contains('active'));
+  }, 2000);
 }
 
 function closeAlbumDetail() {
