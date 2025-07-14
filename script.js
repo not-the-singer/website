@@ -266,6 +266,14 @@ function showMusic() {
 }
 
 function loadAlbums() {
+    // Guard: don't reload if album detail is open
+  if (isOnAlbumDetail) {
+    console.log('Skipping loadAlbums - album detail is open');
+    return;
+  }
+  const grid = document.getElementById('albumGrid');
+  grid.innerHTML = '';
+  
   const grid = document.getElementById('albumGrid');
   grid.innerHTML = '';
 
