@@ -153,7 +153,7 @@ async function fetchStreamingLinks(album) {
       }
       if (platforms.deezer) links.deezer = platforms.deezer.url;
       if (platforms.tidal) links.tidal = platforms.tidal.url;
-      if (platforms.beatport) links.beatport = platforms.beatport.url; // Future-proof for Beatport
+      if (platforms.beatport) links.beatport = platforms.beatport.url;
     }
 
     // Get fallback search URLs for missing platforms
@@ -166,7 +166,6 @@ async function fetchStreamingLinks(album) {
     return finalLinks;
   } catch (error) {
     console.error(`Error fetching streaming links for ${album.name}:`, error);
-    // Return complete fallback if Songlink completely fails
     return getSearchFallbackLinks(album.name);
   }
 }
@@ -200,8 +199,12 @@ function getAlbumTypeDisplay(type, tracks) {
 
 // Filter functionality
 let currentFilter = 'all';
+let filtersSetup = false;
 
 function setupFilters() {
+  // Only set up filters once
+  if (filtersSetup) return;
+  
   const filterButtons = document.querySelectorAll('.filter-btn');
   
   filterButtons.forEach(button => {
@@ -209,9 +212,15 @@ function setupFilters() {
       filterButtons.forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
       currentFilter = button.dataset.filter;
-      loadAlbums();
+      
+      // Only reload albums if not on album detail
+      if (!isOnAlbumDetail) {
+        loadAlbums();
+      }
     });
   });
+  
+  filtersSetup = true;
 }
 
 function getFilteredAlbums() {
@@ -242,7 +251,11 @@ function closeMenu() {
 }
 
 function goHome() {
-  if (isOnAlbumDetail) return closeAlbumDetail();
+  if (isOnAlbumDetail) {
+    closeAlbumDetail();
+    return;
+  }
+  
   if (isOnMusicPage) {
     document.getElementById('musicPage').classList.remove('active');
     document.getElementById('homePage').classList.remove('blur');
@@ -255,27 +268,23 @@ function goHome() {
 
 function showMusic() {
   if (isOnAlbumDetail) return;
+  
   document.getElementById('homePage').classList.add('blur');
-  setTimeout(() => {
-    loadAlbums();
-    document.getElementById('musicPage').classList.add('active');
-    isOnMusicPage = true;
-    setupFilters();
-  }, 300);
+  document.getElementById('musicPage').classList.add('active');
+  isOnMusicPage = true;
+  
+  // Set up filters and load albums
+  setupFilters();
+  loadAlbums();
+  
   closeMenu();
 }
 
 function loadAlbums() {
-  console.log('loadAlbums called');
-  console.trace(); // This will show what called this function
-  
   // Guard: don't reload if album detail is open
   if (isOnAlbumDetail) {
-    console.log('Skipping loadAlbums - album detail is open');
     return;
   }
-  const grid = document.getElementById('albumGrid');
-  grid.innerHTML = '';
   
   const grid = document.getElementById('albumGrid');
   grid.innerHTML = '';
@@ -312,6 +321,9 @@ function loadAlbums() {
 }
 
 function showAlbumDetail(album) {
+  // Set state immediately
+  isOnAlbumDetail = true;
+  
   const detail = document.getElementById('albumDetail');
   const artwork = album.images?.[0]?.url || '';
 
@@ -323,7 +335,6 @@ function showAlbumDetail(album) {
   const linksContainer = document.getElementById('streamingLinks');
   linksContainer.innerHTML = '';
 
-  // Updated platforms list (removed Amazon Music, kept even number)
   const streamingPlatforms = [
     { key: 'spotify', name: 'Spotify', icon: 'fab fa-spotify' },
     { key: 'apple', name: 'Apple Music', icon: 'fab fa-apple' },
@@ -343,7 +354,6 @@ function showAlbumDetail(album) {
       link.target = '_blank';
       link.className = 'streaming-link';
       
-      // Handle Simple Icons differently
       let iconHTML;
       if (platform.icon === 'simple-icons-beatport') {
         iconHTML = `<img src="https://cdn.jsdelivr.net/npm/simple-icons@v13/icons/beatport.svg" style="width: 18px; height: 18px; filter: invert(1);">`;
@@ -358,21 +368,20 @@ function showAlbumDetail(album) {
     }
   });
 
+  // Hide music page and show detail
   document.getElementById('musicPage').classList.remove('active');
   detail.classList.add('active');
-  isOnAlbumDetail = true;
-
-    console.log('Album detail opened, isOnAlbumDetail:', isOnAlbumDetail);
-  setTimeout(() => {
-    console.log('After 2 seconds - still active?', detail.classList.contains('active'));
-  }, 2000);
 }
 
 function closeAlbumDetail() {
+  isOnAlbumDetail = false;
   document.getElementById('albumDetail').classList.remove('active');
+  
+  // Wait for animation to complete before showing music page
   setTimeout(() => {
-    document.getElementById('musicPage').classList.add('active');
-    isOnAlbumDetail = false;
+    if (isOnMusicPage) {
+      document.getElementById('musicPage').classList.add('active');
+    }
   }, 300);
 }
 
@@ -381,8 +390,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
-      if (item.textContent.includes('Music')) showMusic();
-      else closeMenu();
+      if (item.textContent.includes('Music')) {
+        showMusic();
+      } else {
+        closeMenu();
+      }
     });
   });
 
@@ -391,8 +403,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (isOnAlbumDetail) closeAlbumDetail();
-    else if (isOnMusicPage) goHome();
-    else if (isMenuOpen) closeMenu();
+    if (isOnAlbumDetail) {
+      closeAlbumDetail();
+    } else if (isOnMusicPage) {
+      goHome();
+    } else if (isMenuOpen) {
+      closeMenu();
+    }
   }
 });
