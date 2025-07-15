@@ -209,14 +209,14 @@ function setupFilters() {
   
   filterButtons.forEach(button => {
     button.addEventListener('click', () => {
+      // Don't allow filter changes when album detail is open
+      if (isOnAlbumDetail) return;
+      
       filterButtons.forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
       currentFilter = button.dataset.filter;
       
-      // Only reload albums if not on album detail
-      if (!isOnAlbumDetail) {
-        loadAlbums();
-      }
+      loadAlbums();
     });
   });
   
@@ -267,7 +267,10 @@ function goHome() {
 }
 
 function showMusic() {
+  // FIXED: Add guard to prevent interfering with album detail
   if (isOnAlbumDetail) return;
+  
+  if (isOnMusicPage) return; // Already on music page
   
   document.getElementById('homePage').classList.add('blur');
   document.getElementById('musicPage').classList.add('active');
@@ -321,7 +324,9 @@ function loadAlbums() {
 }
 
 function showAlbumDetail(album) {
-  // Set state immediately
+  console.log('Opening album detail for:', album.name);
+  
+  // Set state immediately and ensure no interference
   isOnAlbumDetail = true;
   
   const detail = document.getElementById('albumDetail');
@@ -370,10 +375,16 @@ function showAlbumDetail(album) {
 
   // Hide music page and show detail
   document.getElementById('musicPage').classList.remove('active');
-  detail.classList.add('active');
+  
+  // Use a small delay to ensure the music page is hidden before showing detail
+  setTimeout(() => {
+    detail.classList.add('active');
+    console.log('Album detail should now be visible');
+  }, 100);
 }
 
 function closeAlbumDetail() {
+  console.log('Closing album detail');
   isOnAlbumDetail = false;
   document.getElementById('albumDetail').classList.remove('active');
   
