@@ -124,7 +124,7 @@ body, html {
 
 .menu-section h3 {
   font-size: 12px;
-  color: #999; /* Changed from #666 to #999 for better visibility */
+  color: #999;
   margin-bottom: 8px;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -190,7 +190,7 @@ body, html {
 }
 
 .nav-item span {
-  color: #999; /* Changed from #666 to #999 for better visibility */
+  color: #999;
   font-size: 11px;
   min-width: 20px;
 }
@@ -260,7 +260,8 @@ body, html {
   z-index: 50;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0s 0.6s;
   overflow-y: auto;
   padding: 60px 20px 80px;
   scrollbar-width: none;
@@ -276,6 +277,8 @@ body, html {
 .music-page.active {
   opacity: 1;
   visibility: visible;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0s 0s;
 }
 
 .music-page::before {
@@ -379,7 +382,8 @@ body, html {
   font-size: 12px;
   color: #999;
 }
-/* Album Detail Page */
+
+/* Album Detail Page - FIXED VERSION */
 .album-detail {
   position: fixed;
   top: 0;
@@ -389,7 +393,10 @@ body, html {
   z-index: 300;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  /* FIX: Specific transitions instead of "all" to avoid backdrop-filter bug */
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0s 0.6s;
   background-size: cover;
   background-position: center;
   display: flex;
@@ -397,13 +404,22 @@ body, html {
   justify-content: center;
   padding: 40px 20px 40px;
   overflow-y: auto;
+  /* FIX: Hardware acceleration and isolation */
+  transform: translateZ(0);
+  will-change: opacity, transform;
+  isolation: isolate;
 }
 
 .album-detail.active {
   opacity: 1;
   visibility: visible;
+  /* FIX: Immediate visibility change for active state */
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0s 0s;
 }
 
+/* FIX: Separate backdrop layer to avoid Chrome backdrop-filter bug */
 .album-detail::before {
   content: '';
   position: fixed;
@@ -412,9 +428,21 @@ body, html {
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.album-detail::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   z-index: -1;
+  pointer-events: none;
 }
 
 .album-detail-content {
@@ -670,65 +698,39 @@ body, html {
 
   /* Streaming links - responsive grid */
   .streaming-links {
-    grid-template-columns: 1fr; /* Single column instead of auto-fit */
-    gap: clamp(16px, 3vh, 24px); /* Increased gap */
+    grid-template-columns: 1fr;
+    gap: clamp(16px, 3vh, 24px);
     margin-bottom: clamp(32px, 8vh, 60px);
     width: 100%;
     max-width: 100%;
   }
 
   .streaming-link {
-    padding: clamp(16px, 3vh, 24px) clamp(20px, 5vw, 28px); /* Increased padding */
-    font-size: clamp(14px, 3.5vw, 16px); /* Increased from 11px minimum */
-    min-height: clamp(56px, 7vh, 68px); /* Increased minimum height */
+    padding: clamp(16px, 3vh, 24px) clamp(20px, 5vw, 28px);
+    font-size: clamp(14px, 3.5vw, 16px);
+    min-height: clamp(56px, 7vh, 68px);
     display: flex;
     align-items: center;
   }
   
   .streaming-link i, 
   .streaming-link img {
-    width: clamp(18px, 4.5vw, 22px); /* Increased icon size */
+    width: clamp(18px, 4.5vw, 22px);
     height: clamp(18px, 4.5vw, 22px);
-    margin-right: clamp(16px, 4vw, 20px); /* Increased spacing */
+    margin-right: clamp(16px, 4vw, 20px);
   }
 
   .back-button {
     top: clamp(16px, 3vh, 24px);
     left: clamp(16px, 3vw, 24px);
-    padding: clamp(8px, 1.5vh, 16px) clamp(12px, 4vw, 24px); /* Same as .bubble */
-    font-size: clamp(11px, 3vw, 16px); /* Same as .bubble */
+    padding: clamp(8px, 1.5vh, 16px) clamp(12px, 4vw, 24px);
+    font-size: clamp(11px, 3vw, 16px);
   }
+}
 
 /* Only prevent scrolling on home page for small screens */
 @media screen and (max-width: 480px) {
   body, html {
-    overflow-y: hidden; /* Only for very small screens */
+    overflow-y: hidden;
   }
-}
-/* NUCLEAR CSS FIX - Force album detail to be visible */
-.album-detail.active {
-  opacity: 1 !important;
-  visibility: visible !important;
-  z-index: 99999 !important;
-  background-color: rgba(0, 0, 0, 0.8) !important;
-  display: flex !important;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  pointer-events: all !important;
-}
-
-.album-detail.active .album-detail-content {
-  opacity: 1 !important;
-  visibility: visible !important;
-  z-index: 100000 !important;
-  position: relative !important;
-}
-
-.album-detail.active .back-button {
-  opacity: 1 !important;
-  visibility: visible !important;
-  z-index: 100001 !important;
 }
