@@ -285,6 +285,7 @@ function showMusic() {
 
 function loadAlbums() {
   console.log('loadAlbums called, isOnAlbumDetail:', isOnAlbumDetail);
+  console.log('Call stack:', new Error().stack);
   
   // STRONG GUARD: absolutely do not run if album detail is open
   if (isOnAlbumDetail) {
