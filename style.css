@@ -705,3 +705,30 @@ body, html {
     overflow-y: hidden; /* Only for very small screens */
   }
 }
+/* NUCLEAR CSS FIX - Force album detail to be visible */
+.album-detail.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 99999 !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: all !important;
+}
+
+.album-detail.active .album-detail-content {
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 100000 !important;
+  position: relative !important;
+}
+
+.album-detail.active .back-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 100001 !important;
+}
