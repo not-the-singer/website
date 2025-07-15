@@ -266,7 +266,10 @@ function showMusic() {
 }
 
 function loadAlbums() {
-    // Guard: don't reload if album detail is open
+  console.log('loadAlbums called');
+  console.trace(); // This will show what called this function
+  
+  // Guard: don't reload if album detail is open
   if (isOnAlbumDetail) {
     console.log('Skipping loadAlbums - album detail is open');
     return;
