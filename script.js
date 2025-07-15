@@ -202,25 +202,9 @@ let currentFilter = 'all';
 let filtersSetup = false;
 
 function setupFilters() {
-  // Only set up filters once
-  if (filtersSetup) return;
-  
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  
-  filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Don't allow filter changes when album detail is open
-      if (isOnAlbumDetail) return;
-      
-      filterButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-      currentFilter = button.dataset.filter;
-      
-      loadAlbums();
-    });
-  });
-  
-  filtersSetup = true;
+  // COMPLETELY DISABLE FILTERS FOR TESTING
+  console.log('Filters disabled for testing');
+  return;
 }
 
 function getFilteredAlbums() {
@@ -251,8 +235,9 @@ function closeMenu() {
 }
 
 function goHome() {
+  // Don't automatically close album detail - let the user do it manually
   if (isOnAlbumDetail) {
-    closeAlbumDetail();
+    // Do nothing when album detail is open
     return;
   }
   
@@ -267,10 +252,7 @@ function goHome() {
 }
 
 function showMusic() {
-  // FIXED: Add guard to prevent interfering with album detail
   if (isOnAlbumDetail) return;
-  
-  if (isOnMusicPage) return; // Already on music page
   
   document.getElementById('homePage').classList.add('blur');
   document.getElementById('musicPage').classList.add('active');
@@ -302,7 +284,13 @@ function loadAlbums() {
   filteredAlbums.forEach(album => {
     const card = document.createElement('div');
     card.className = 'album-card';
-    card.onclick = () => showAlbumDetail(album);
+    
+    // Use addEventListener with stopPropagation to prevent event bubbling
+    card.addEventListener('click', (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      showAlbumDetail(album);
+    });
 
     const artwork = album.images?.[0]?.url || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop';
     const type = getAlbumTypeDisplay(album.album_type, album.total_tracks);
@@ -324,9 +312,6 @@ function loadAlbums() {
 }
 
 function showAlbumDetail(album) {
-  console.log('Opening album detail for:', album.name);
-  
-  // Set state immediately and ensure no interference
   isOnAlbumDetail = true;
   
   const detail = document.getElementById('albumDetail');
@@ -373,22 +358,14 @@ function showAlbumDetail(album) {
     }
   });
 
-  // Hide music page and show detail
   document.getElementById('musicPage').classList.remove('active');
-  
-  // Use a small delay to ensure the music page is hidden before showing detail
-  setTimeout(() => {
-    detail.classList.add('active');
-    console.log('Album detail should now be visible');
-  }, 100);
+  detail.classList.add('active');
 }
 
 function closeAlbumDetail() {
-  console.log('Closing album detail');
   isOnAlbumDetail = false;
   document.getElementById('albumDetail').classList.remove('active');
   
-  // Wait for animation to complete before showing music page
   setTimeout(() => {
     if (isOnMusicPage) {
       document.getElementById('musicPage').classList.add('active');
@@ -423,3 +400,52 @@ document.addEventListener('keydown', e => {
     }
   }
 });
+
+// Debug function
+window.debugStates = function() {
+  console.log('=== DEBUG STATES ===');
+  console.log('isOnMusicPage:', isOnMusicPage);
+  console.log('isOnAlbumDetail:', isOnAlbumDetail);
+  console.log('isMenuOpen:', isMenuOpen);
+  
+  const detail = document.getElementById('albumDetail');
+  const musicPage = document.getElementById('musicPage');
+  
+  console.log('Album detail classes:', detail.className);
+  console.log('Music page classes:', musicPage.className);
+  console.log('Detail opacity:', window.getComputedStyle(detail).opacity);
+  console.log('Music page opacity:', window.getComputedStyle(musicPage).opacity);
+};
+
+
+// Nuclear debugging - catch anything that removes the active class
+document.addEventListener('DOMContentLoaded', () => {
+  const albumDetail = document.getElementById('albumDetail');
+  
+  // Override the classList.remove method to log what's removing 'active'
+  const originalRemove = albumDetail.classList.remove;
+  albumDetail.classList.remove = function(className) {
+    if (className === 'active') {
+      console.log('SOMETHING REMOVED ACTIVE CLASS!');
+      console.log('Stack trace:', new Error().stack);
+    }
+    return originalRemove.call(this, className);
+  };
+});
+// Monitor the album detail element every 100ms
+setInterval(() => {
+  if (isOnAlbumDetail) {
+    const detail = document.getElementById('albumDetail');
+    const computed = window.getComputedStyle(detail);
+    
+    console.log('Album detail monitoring:', {
+      className: detail.className,
+      opacity: computed.opacity,
+      visibility: computed.visibility,
+      zIndex: computed.zIndex,
+      display: computed.display,
+      transform: computed.transform,
+      filter: computed.filter
+    });
+  }
+}, 100);
