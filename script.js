@@ -411,6 +411,33 @@ function setupStreamingLinks(album) {
       linksContainer.appendChild(link);
     }
   });
+  
+}
+
+async function fetchAllMusic() {
+  try {
+    console.log('Fetching all music...');
+    
+    // Initialize with an empty array for Spotify track names
+    // This prevents duplicate tracks when fetching from SoundCloud
+    const spotifyTrackNames = [];
+    
+    // Fetch SoundCloud tracks
+    const soundcloudTracks = await fetchSoundCloudTracks(spotifyTrackNames);
+    
+    // Combine all tracks
+    albums = [...soundcloudTracks];
+    
+    // Sort by release date, newest first
+    albums.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
+    
+    // Load the albums if we're on the music page
+    if (isOnMusicPage) {
+      loadAlbums();
+    }
+  } catch (error) {
+    console.error('Error fetching music:', error);
+  }
 }
 
 // Initialize on page load
