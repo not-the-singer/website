@@ -431,3 +431,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return originalRemove.call(this, className);
   };
 });
+// Monitor the album detail element every 100ms
+setInterval(() => {
+  if (isOnAlbumDetail) {
+    const detail = document.getElementById('albumDetail');
+    const computed = window.getComputedStyle(detail);
+    
+    console.log('Album detail monitoring:', {
+      className: detail.className,
+      opacity: computed.opacity,
+      visibility: computed.visibility,
+      zIndex: computed.zIndex,
+      display: computed.display,
+      transform: computed.transform,
+      filter: computed.filter
+    });
+  }
+}, 100);
