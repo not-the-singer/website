@@ -235,8 +235,9 @@ function closeMenu() {
 }
 
 function goHome() {
+  // Don't automatically close album detail - let the user do it manually
   if (isOnAlbumDetail) {
-    closeAlbumDetail();
+    // Do nothing when album detail is open
     return;
   }
   
