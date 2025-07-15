@@ -269,29 +269,19 @@ function goHome() {
 function showMusic() {
   if (isOnAlbumDetail) return;
   
-  // Add a small delay to check if an album detail is about to open
-  setTimeout(() => {
-    if (isOnAlbumDetail) {
-      console.log('showMusic cancelled - album detail opened');
-      return;
-    }
-    
-    console.log('showMusic proceeding');
-    document.getElementById('homePage').classList.add('blur');
-    document.getElementById('musicPage').classList.add('active');
-    isOnMusicPage = true;
-    
-    // Set up filters and load albums
-    setupFilters();
-    loadAlbums();
-    
-    closeMenu();
-  }, 10);
+  document.getElementById('homePage').classList.add('blur');
+  document.getElementById('musicPage').classList.add('active');
+  isOnMusicPage = true;
+  
+  // Set up filters and load albums
+  setupFilters();
+  loadAlbums();
+  
+  closeMenu();
 }
 
 function loadAlbums() {
   console.log('loadAlbums called, isOnAlbumDetail:', isOnAlbumDetail);
-  console.log('Call stack:', new Error().stack);
   
   // STRONG GUARD: absolutely do not run if album detail is open
   if (isOnAlbumDetail) {
@@ -312,7 +302,13 @@ function loadAlbums() {
   filteredAlbums.forEach(album => {
     const card = document.createElement('div');
     card.className = 'album-card';
-    card.onclick = () => showAlbumDetail(album);
+    
+    // FIXED: Use addEventListener instead of onclick and stop propagation
+    card.addEventListener('click', (event) => {
+      event.stopPropagation();
+      event.preventDefault();
+      showAlbumDetail(album);
+    });
 
     const artwork = album.images?.[0]?.url || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop';
     const type = getAlbumTypeDisplay(album.album_type, album.total_tracks);
