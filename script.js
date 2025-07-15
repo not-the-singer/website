@@ -267,20 +267,26 @@ function goHome() {
 }
 
 function showMusic() {
-  // FIXED: Add guard to prevent interfering with album detail
   if (isOnAlbumDetail) return;
   
-  if (isOnMusicPage) return; // Already on music page
-  
-  document.getElementById('homePage').classList.add('blur');
-  document.getElementById('musicPage').classList.add('active');
-  isOnMusicPage = true;
-  
-  // Set up filters and load albums
-  setupFilters();
-  loadAlbums();
-  
-  closeMenu();
+  // Add a small delay to check if an album detail is about to open
+  setTimeout(() => {
+    if (isOnAlbumDetail) {
+      console.log('showMusic cancelled - album detail opened');
+      return;
+    }
+    
+    console.log('showMusic proceeding');
+    document.getElementById('homePage').classList.add('blur');
+    document.getElementById('musicPage').classList.add('active');
+    isOnMusicPage = true;
+    
+    // Set up filters and load albums
+    setupFilters();
+    loadAlbums();
+    
+    closeMenu();
+  }, 10);
 }
 
 function loadAlbums() {
