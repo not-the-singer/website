@@ -32,7 +32,25 @@ async function fetchSoundCloudTracks(spotifyTrackNames) {
   try {
     console.log('Fetching tracks from SoundCloud via API proxy...');
     
-    const response = await fetch(`${API_BASE_URL}/api/soundcloud`);
+    // First try the regular request
+    let response = await fetch(`${API_BASE_URL}/api/soundcloud`);
+    
+    // If we get a 401 or 500, try to refresh the token
+    if (response.status === 401 || response.status === 500) {
+      console.log('Token expired, attempting refresh...');
+      
+      // Call token refresh endpoint
+      const refreshResponse = await fetch(`${API_BASE_URL}/api/soundcloud/refresh`, {
+        method: 'POST'
+      });
+      
+      if (!refreshResponse.ok) {
+        throw new Error(`Token refresh failed: ${refreshResponse.status}`);
+      }
+      
+      // Retry the original request with new token
+      response = await fetch(`${API_BASE_URL}/api/soundcloud`);
+    }
     
     if (!response.ok) {
       throw new Error(`SoundCloud API responded with status: ${response.status}`);
@@ -40,6 +58,11 @@ async function fetchSoundCloudTracks(spotifyTrackNames) {
     
     const tracks = await response.json();
     console.log('Raw SoundCloud data:', tracks);
+    
+    if (!tracks || !Array.isArray(tracks)) {
+      console.warn('Invalid tracks data received:', tracks);
+      return [];
+    }
     
     // Filter to only include public tracks that aren't duplicates of Spotify
     const filteredTracks = tracks.filter(track => {
@@ -69,57 +92,34 @@ async function fetchSoundCloudTracks(spotifyTrackNames) {
     }));
   } catch (error) {
     console.error('Error fetching SoundCloud tracks:', error);
+    
+    // Show error state in UI
+    const grid = document.getElementById('albumGrid');
+    if (grid) {
+      const errorMessage = document.createElement('div');
+      errorMessage.style.cssText = 'text-align: center; padding: 40px; color: #666;';
+      errorMessage.innerHTML = `
+        <div>Unable to load SoundCloud tracks</div>
+        <button onclick="retryFetchSoundCloud()" 
+                style="margin-top: 10px; padding: 8px 16px; background: rgba(255,255,255,0.1); 
+                       border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 20px; 
+                       cursor: pointer;">
+          Retry
+        </button>
+      `;
+      grid.appendChild(errorMessage);
+    }
+    
     return [];
   }
 }
 
-// Combined fetch function
-async function fetchAllMusic() {
-  try {
-    console.log('Fetching all music from Spotify and SoundCloud...');
-    
-    const [spotifyResponse] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/spotify`)
-    ]);
-    
-    const spotifyAlbums = spotifyResponse.ok ? await spotifyResponse.json() : [];
-    
-    // Extract all Spotify album names for duplicate checking
-    const spotifyTrackNames = spotifyAlbums.map(album => album.name);
-    
-    // Now fetch SoundCloud tracks with duplicate filtering
-    const soundcloudTracks = await fetchSoundCloudTracks(spotifyTrackNames);
-    
-    // Process Spotify albums (with streaming links)
-    const processedSpotifyAlbums = await Promise.all(spotifyAlbums.map(async (album) => {
-      const cacheKey = `${album.id}_${album.name}`;
-      let streamingLinks;
-      
-      if (streamingLinksCache[cacheKey]) {
-        streamingLinks = streamingLinksCache[cacheKey];
-      } else {
-        streamingLinks = await fetchStreamingLinks(album);
-        streamingLinksCache[cacheKey] = streamingLinks;
-      }
-
-      return {
-        ...album,
-        streaming_links: streamingLinks,
-        source: 'spotify'
-      };
-    }));
-    
-    // Combine all music
-    albums = [...processedSpotifyAlbums, ...soundcloudTracks]
-      .sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
-    
-    console.log('All music loaded:', albums);
-    
-  } catch (error) {
-    console.error('Error fetching all music:', error);
-    albums = [];
-  }
-}
+// Add retry function
+window.retryFetchSoundCloud = async function() {
+  console.log('Retrying SoundCloud fetch...');
+  await fetchAllMusic();
+  loadAlbums();
+};
 
 async function fetchStreamingLinks(album) {
   try {
