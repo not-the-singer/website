@@ -202,25 +202,9 @@ let currentFilter = 'all';
 let filtersSetup = false;
 
 function setupFilters() {
-  // Only set up filters once
-  if (filtersSetup) return;
-  
-  const filterButtons = document.querySelectorAll('.filter-btn');
-  
-  filterButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Don't allow filter changes when album detail is open
-      if (isOnAlbumDetail) return;
-      
-      filterButtons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
-      currentFilter = button.dataset.filter;
-      
-      loadAlbums();
-    });
-  });
-  
-  filtersSetup = true;
+  // COMPLETELY DISABLE FILTERS FOR TESTING
+  console.log('Filters disabled for testing');
+  return;
 }
 
 function getFilteredAlbums() {
@@ -373,53 +357,33 @@ function showAlbumDetail(album) {
     }
   });
 
-  // Hide music page and show detail using INLINE STYLES instead of classes
-  document.getElementById('musicPage').style.display = 'none';
-  
-  // Force show album detail with inline styles that can't be overridden
-  detail.style.opacity = '1';
-  detail.style.visibility = 'visible';
-  detail.style.position = 'fixed';
-  detail.style.top = '0';
-  detail.style.left = '0';
-  detail.style.width = '100vw';
-  detail.style.height = '100vh';
-  detail.style.zIndex = '9999';
-  detail.style.display = 'flex';
-  detail.style.alignItems = 'flex-start';
-  detail.style.justifyContent = 'center';
-  detail.style.padding = '40px 20px';
-  detail.style.overflowY = 'auto';
+  document.getElementById('musicPage').classList.remove('active');
+  detail.classList.add('active');
 }
 
 function closeAlbumDetail() {
   isOnAlbumDetail = false;
-  
-  const detail = document.getElementById('albumDetail');
-  
-  // Reset all inline styles
-  detail.style.opacity = '';
-  detail.style.visibility = '';
-  detail.style.position = '';
-  detail.style.top = '';
-  detail.style.left = '';
-  detail.style.width = '';
-  detail.style.height = '';
-  detail.style.zIndex = '';
-  detail.style.display = '';
-  detail.style.alignItems = '';
-  detail.style.justifyContent = '';
-  detail.style.padding = '';
-  detail.style.overflowY = '';
+  document.getElementById('albumDetail').classList.remove('active');
   
   setTimeout(() => {
     if (isOnMusicPage) {
-      const musicPage = document.getElementById('musicPage');
-      musicPage.style.display = '';
-      musicPage.classList.add('active');
+      document.getElementById('musicPage').classList.add('active');
     }
   }, 300);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchAllMusic();
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (item.textContent.includes('Music')) {
+        showMusic();
+      } else {
+        closeMenu();
+      }
+    });
+  });
 
   document.getElementById('menuDropdown').addEventListener('click', e => e.stopPropagation());
 });
@@ -435,3 +399,19 @@ document.addEventListener('keydown', e => {
     }
   }
 });
+
+// Debug function
+window.debugStates = function() {
+  console.log('=== DEBUG STATES ===');
+  console.log('isOnMusicPage:', isOnMusicPage);
+  console.log('isOnAlbumDetail:', isOnAlbumDetail);
+  console.log('isMenuOpen:', isMenuOpen);
+  
+  const detail = document.getElementById('albumDetail');
+  const musicPage = document.getElementById('musicPage');
+  
+  console.log('Album detail classes:', detail.className);
+  console.log('Music page classes:', musicPage.className);
+  console.log('Detail opacity:', window.getComputedStyle(detail).opacity);
+  console.log('Music page opacity:', window.getComputedStyle(musicPage).opacity);
+};
