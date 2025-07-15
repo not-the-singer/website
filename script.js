@@ -48,7 +48,7 @@ async function fetchSoundCloudTracks(spotifyTrackNames) {
         throw new Error(`Token refresh failed: ${refreshResponse.status}`);
       }
       
-      // Retry the original request with new token
+      // Retry the original request
       response = await fetch(`${API_BASE_URL}/api/soundcloud`);
     }
     
@@ -113,13 +113,6 @@ async function fetchSoundCloudTracks(spotifyTrackNames) {
     return [];
   }
 }
-
-// Add retry function
-window.retryFetchSoundCloud = async function() {
-  console.log('Retrying SoundCloud fetch...');
-  await fetchAllMusic();
-  loadAlbums();
-};
 
 async function fetchStreamingLinks(album) {
   try {
