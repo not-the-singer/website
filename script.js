@@ -284,8 +284,11 @@ function showMusic() {
 }
 
 function loadAlbums() {
-  // Guard: don't reload if album detail is open
+  console.log('loadAlbums called, isOnAlbumDetail:', isOnAlbumDetail);
+  
+  // STRONG GUARD: absolutely do not run if album detail is open
   if (isOnAlbumDetail) {
+    console.log('BLOCKED: loadAlbums prevented because album detail is open');
     return;
   }
   
@@ -321,13 +324,15 @@ function loadAlbums() {
     `;
     grid.appendChild(card);
   });
+  
+  console.log('loadAlbums completed');
 }
 
 function showAlbumDetail(album) {
-  console.log('Opening album detail for:', album.name);
-  
-  // Set state immediately and ensure no interference
+  // SET STATE FIRST THING - before anything else can interfere
   isOnAlbumDetail = true;
+  
+  console.log('Album detail opening, isOnAlbumDetail set to:', isOnAlbumDetail);
   
   const detail = document.getElementById('albumDetail');
   const artwork = album.images?.[0]?.url || '';
@@ -375,12 +380,9 @@ function showAlbumDetail(album) {
 
   // Hide music page and show detail
   document.getElementById('musicPage').classList.remove('active');
+  detail.classList.add('active');
   
-  // Use a small delay to ensure the music page is hidden before showing detail
-  setTimeout(() => {
-    detail.classList.add('active');
-    console.log('Album detail should now be visible');
-  }, 100);
+  console.log('Album detail setup complete');
 }
 
 function closeAlbumDetail() {
