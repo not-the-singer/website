@@ -415,3 +415,19 @@ window.debugStates = function() {
   console.log('Detail opacity:', window.getComputedStyle(detail).opacity);
   console.log('Music page opacity:', window.getComputedStyle(musicPage).opacity);
 };
+
+
+// Nuclear debugging - catch anything that removes the active class
+document.addEventListener('DOMContentLoaded', () => {
+  const albumDetail = document.getElementById('albumDetail');
+  
+  // Override the classList.remove method to log what's removing 'active'
+  const originalRemove = albumDetail.classList.remove;
+  albumDetail.classList.remove = function(className) {
+    if (className === 'active') {
+      console.log('SOMETHING REMOVED ACTIVE CLASS!');
+      console.log('Stack trace:', new Error().stack);
+    }
+    return originalRemove.call(this, className);
+  };
+});
