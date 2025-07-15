@@ -267,17 +267,13 @@ function goHome() {
 }
 
 function showMusic() {
-  if (window.blockShowMusic) {
-    console.log('showMusic blocked by album detail');
-    return;
-  }
-  
   if (isOnAlbumDetail) return;
   
   document.getElementById('homePage').classList.add('blur');
   document.getElementById('musicPage').classList.add('active');
   isOnMusicPage = true;
   
+  // Set up filters and load albums
   setupFilters();
   loadAlbums();
   
@@ -285,11 +281,8 @@ function showMusic() {
 }
 
 function loadAlbums() {
-  console.log('loadAlbums called, isOnAlbumDetail:', isOnAlbumDetail);
-  
-  // STRONG GUARD: absolutely do not run if album detail is open
+  // Guard: don't reload if album detail is open
   if (isOnAlbumDetail) {
-    console.log('BLOCKED: loadAlbums prevented because album detail is open');
     return;
   }
   
@@ -307,7 +300,7 @@ function loadAlbums() {
     const card = document.createElement('div');
     card.className = 'album-card';
     
-    // FIXED: Use addEventListener instead of onclick and stop propagation
+    // Use addEventListener with stopPropagation to prevent event bubbling
     card.addEventListener('click', (event) => {
       event.stopPropagation();
       event.preventDefault();
@@ -331,16 +324,11 @@ function loadAlbums() {
     `;
     grid.appendChild(card);
   });
-  
-  console.log('loadAlbums completed');
 }
 
 function showAlbumDetail(album) {
-  // Immediately disable showMusic to prevent interference
-  window.blockShowMusic = true;
+  // Set state immediately before anything else can interfere
   isOnAlbumDetail = true;
-  
-  console.log('Album detail opening, showMusic blocked');
   
   const detail = document.getElementById('albumDetail');
   const artwork = album.images?.[0]?.url || '';
@@ -387,14 +375,15 @@ function showAlbumDetail(album) {
   });
 
   // Hide music page and show detail
-  document.getElementById('
+  document.getElementById('musicPage').classList.remove('active');
+  detail.classList.add('active');
+}
 
 function closeAlbumDetail() {
   isOnAlbumDetail = false;
-  window.blockShowMusic = false;
-  
   document.getElementById('albumDetail').classList.remove('active');
   
+  // Wait for animation to complete before showing music page
   setTimeout(() => {
     if (isOnMusicPage) {
       document.getElementById('musicPage').classList.add('active');
@@ -429,3 +418,19 @@ document.addEventListener('keydown', e => {
     }
   }
 });
+
+// Debug function
+window.debugStates = function() {
+  console.log('=== DEBUG STATES ===');
+  console.log('isOnMusicPage:', isOnMusicPage);
+  console.log('isOnAlbumDetail:', isOnAlbumDetail);
+  console.log('isMenuOpen:', isMenuOpen);
+  
+  const detail = document.getElementById('albumDetail');
+  const musicPage = document.getElementById('musicPage');
+  
+  console.log('Album detail classes:', detail.className);
+  console.log('Music page classes:', musicPage.className);
+  console.log('Detail opacity:', window.getComputedStyle(detail).opacity);
+  console.log('Music page opacity:', window.getComputedStyle(musicPage).opacity);
+};
